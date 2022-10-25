@@ -94,6 +94,8 @@ file(GLOB wiringx
 	"${PROJECT_SOURCE_DIR}/src/platform/hardkernel/*.h"
 	"${PROJECT_SOURCE_DIR}/src/platform/xunlong/*.c"
 	"${PROJECT_SOURCE_DIR}/src/platform/xunlong/*.h"
+	"${PROJECT_SOURCE_DIR}/src/platform/radxa/*.h"
+	"${PROJECT_SOURCE_DIR}/src/platform/radxa/*.c"
 	"${PROJECT_SOURCE_DIR}/src/soc/*.c"
 	"${PROJECT_SOURCE_DIR}/src/soc/*.h"
 	"${PROJECT_SOURCE_DIR}/src/soc/allwinner/*.c"
@@ -106,6 +108,8 @@ file(GLOB wiringx
 	"${PROJECT_SOURCE_DIR}/src/soc/amlogic/*.c"
 	"${PROJECT_SOURCE_DIR}/src/soc/samsung/*.h"
 	"${PROJECT_SOURCE_DIR}/src/soc/samsung/*.c"
+	"${PROJECT_SOURCE_DIR}/src/soc/rockchip/*.h"
+	"${PROJECT_SOURCE_DIR}/src/soc/rockchip/*.c"
 )
 
 add_library(wiringx_static STATIC ${wiringx})
