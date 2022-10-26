@@ -60,6 +60,11 @@
 #include "platform/hardkernel/odroidc2.h"
 #include "platform/hardkernel/odroidxu4.h"
 #include "platform/radxa/rock3c.h"
+#include "platform/radxa/rock3a_v1_2.h"
+#include "platform/radxa/rock3a_v1_3.h"
+#include "platform/radxa/rock3_cm3_io.h"
+#include "platform/radxa/rock3b.h"
+#include "platform/radxa/radxa_e23.h"
 
 void wiringXDefaultLog(int prio, char *file, int line, const char *format_str, ...);
 
@@ -237,7 +242,7 @@ static void wiringXInit(void) {
 	amlogicS805Init();
 	amlogicS905Init();
 	exynos5422Init();
-	rock3cInit();
+	rk356xInit();
 
 	/* Init all platforms */
 	pcduino1Init();
@@ -259,7 +264,12 @@ static void wiringXInit(void) {
 	odroidc1Init();
 	odroidc2Init();
 	odroidxu4Init();
-	rk356xInit();
+	rock3cInit();
+	rock3a_v1_2_init();
+	rock3a_v1_3_init();
+	rock3_cm3_io_init();
+	rock3bInit();
+	radxa_e23Init();
 }
 
 EXPORT int wiringXSetup(char *name, void (*func)(int, char *, int, const char *, ...)) {
