@@ -62,9 +62,10 @@
 #include "platform/radxa/rock3c.h"
 #include "platform/radxa/rock3a_v1_2.h"
 #include "platform/radxa/rock3a_v1_3.h"
-#include "platform/radxa/rock3_cm3_io.h"
+#include "platform/radxa/radxa_cm3_io.h"
 #include "platform/radxa/rock3b.h"
 #include "platform/radxa/radxa_e23.h"
+#include "platform/radxa/radxa_e25.h"
 
 void wiringXDefaultLog(int prio, char *file, int line, const char *format_str, ...);
 
@@ -267,9 +268,10 @@ static void wiringXInit(void) {
 	rock3cInit();
 	rock3a_v1_2_init();
 	rock3a_v1_3_init();
-	rock3_cm3_io_init();
+	radxa_cm3_io_init();
 	rock3bInit();
 	radxa_e23Init();
+	radxa_e25Init();
 }
 
 EXPORT int wiringXSetup(char *name, void (*func)(int, char *, int, const char *, ...)) {

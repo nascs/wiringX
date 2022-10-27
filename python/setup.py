@@ -48,8 +48,9 @@ modules = [
 			'../src/platform/radxa/rock3b.c',
 			'../src/platform/radxa/rock3a_v1_2.c',
 			'../src/platform/radxa/rock3a_v1_3.c',
-			'../src/platform/radxa/rock3_cm3_io.c',
+			'../src/platform/radxa/radxa_cm3_io.c',
 			'../src/platform/radxa/radxa_e23.c',
+			'../src/platform/radxa/radxa_e25.c',
 		],
 		include_dirs=['../src/']
 	),

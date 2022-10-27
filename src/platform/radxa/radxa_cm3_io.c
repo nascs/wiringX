@@ -20,9 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../../soc/soc.h"
 #include "../../wiringx.h"
 #include "../platform.h"
-#include "rock3_cm3_io.h"
+#include "radxa_cm3_io.h"
 
-struct platform_t *rock3_cm3_io = NULL;
+struct platform_t *radxa_cm3_io = NULL;
 
 static int map[] = {
     /*  GPIO0_C7     GPIO3_C7     GPIO0_B7    GPIO0_C3    */
@@ -45,7 +45,7 @@ static int map[] = {
 
 #define _sizeof(arr) (sizeof(arr) / sizeof(arr[0]))
 
-static int rock3_cm3_io_ValidGPIO(int pin) {
+static int radxa_cm3_io_ValidGPIO(int pin) {
     if(pin >= 0 && pin < _sizeof(map)) {
         if(map[pin] == -1) {
             return -1;
@@ -56,29 +56,29 @@ static int rock3_cm3_io_ValidGPIO(int pin) {
     }
 }
 
-static int rock3_cm3_io_Setup(void) {
-    rock3_cm3_io->soc->setup();
-    rock3_cm3_io->soc->setMap(map,_sizeof(map));
-    rock3_cm3_io->soc->setIRQ(map,_sizeof(map));
+static int radxa_cm3_io_Setup(void) {
+    radxa_cm3_io->soc->setup();
+    radxa_cm3_io->soc->setMap(map,_sizeof(map));
+    radxa_cm3_io->soc->setIRQ(map,_sizeof(map));
     return 0;
 }
 
-void rock3_cm3_io_init(void) {
-    platform_register(&rock3_cm3_io,"rock3_cm3_io");
+void radxa_cm3_io_init(void) {
+    platform_register(&radxa_cm3_io,"radxa_cm3_io");
 
-    rock3_cm3_io->soc = soc_get("Rockchip","RK356X");
-    rock3_cm3_io->soc->setMap(map,_sizeof(map));
+    radxa_cm3_io->soc = soc_get("Rockchip","RK356X");
+    radxa_cm3_io->soc->setMap(map,_sizeof(map));
 
-    rock3_cm3_io->digitalRead = rock3_cm3_io->soc->digitalRead;
-    rock3_cm3_io->digitalWrite = rock3_cm3_io->soc->digitalWrite;
-    rock3_cm3_io->pinMode = rock3_cm3_io->soc->pinMode;
-    rock3_cm3_io->setup = &rock3_cm3_io_Setup;
+    radxa_cm3_io->digitalRead = radxa_cm3_io->soc->digitalRead;
+    radxa_cm3_io->digitalWrite = radxa_cm3_io->soc->digitalWrite;
+    radxa_cm3_io->pinMode = radxa_cm3_io->soc->pinMode;
+    radxa_cm3_io->setup = &radxa_cm3_io_Setup;
 
-    rock3_cm3_io->isr = rock3_cm3_io->soc->isr;
-    rock3_cm3_io->waitForInterrupt = rock3_cm3_io->soc->waitForInterrupt;
+    radxa_cm3_io->isr = radxa_cm3_io->soc->isr;
+    radxa_cm3_io->waitForInterrupt = radxa_cm3_io->soc->waitForInterrupt;
 
-    rock3_cm3_io->selectableFd = rock3_cm3_io->soc->selectableFd;
-    rock3_cm3_io->gc = rock3_cm3_io->soc->gc; 
+    radxa_cm3_io->selectableFd = radxa_cm3_io->soc->selectableFd;
+    radxa_cm3_io->gc = radxa_cm3_io->soc->gc; 
 
-    rock3_cm3_io->validGPIO = &rock3_cm3_io_ValidGPIO;
+    radxa_cm3_io->validGPIO = &radxa_cm3_io_ValidGPIO;
 }
