@@ -39,6 +39,7 @@
 #include "soc/amlogic/s905.h"
 #include "soc/samsung/exynos5422.h"
 #include "soc/rockchip/rk356x.h"
+#include "soc/rockchip/rk3588.h"
 
 #include "platform/linksprite/pcduino1.h"
 #include "platform/lemaker/bananapi1.h"
@@ -66,6 +67,7 @@
 #include "platform/radxa/rock3b.h"
 #include "platform/radxa/radxa_e23.h"
 #include "platform/radxa/radxa_e25.h"
+#include "platform/radxa/rock5b.h"
 
 void wiringXDefaultLog(int prio, char *file, int line, const char *format_str, ...);
 
@@ -244,6 +246,7 @@ static void wiringXInit(void) {
 	amlogicS905Init();
 	exynos5422Init();
 	rk356xInit();
+	rk3588Init();
 
 	/* Init all platforms */
 	pcduino1Init();
@@ -265,13 +268,16 @@ static void wiringXInit(void) {
 	odroidc1Init();
 	odroidc2Init();
 	odroidxu4Init();
-	rock3cInit();
-	rock3a_v1_2_init();
-	rock3a_v1_3_init();
 	radxa_cm3_io_init();
-	rock3bInit();
 	radxa_e23Init();
 	radxa_e25Init();
+	rock3a_v1_2_init();
+	rock3a_v1_3_init();
+	rock3bInit();
+	rock3cInit();
+	rock5a_v1_1Init();
+	rock5a_v1_2Init();
+	rock5bInit();
 }
 
 EXPORT int wiringXSetup(char *name, void (*func)(int, char *, int, const char *, ...)) {

@@ -415,6 +415,7 @@ PyMODINIT_FUNC initgpio(void) {
 	PyModule_AddObject(module, "RADXA_CM3_IO", Py_BuildValue("s", "radxa_cm3_io"));
 	PyModule_AddObject(module, "RADXA_E23", Py_BuildValue("s", "radxa_e23"));
 	PyModule_AddObject(module, "RADXA_E25", Py_BuildValue("s", "radxa_e25"));
+	PyModule_AddObject(module, "ROCK5B", Py_BuildValue("s", "rock5b"));
 
 #if PY_MAJOR_VERSION >= 3
 	return module;
