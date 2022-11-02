@@ -27,8 +27,8 @@ struct platform_t *radxa_e23 = NULL;
 static int map[] = {
     /*  GPIO3_A1     GPIO3_B4     GPIO0_C4    GPIO0_C6    */
          97,            108,         20,         22,
-    /*                                        GPIO0_C5    */  
-         -1,             -1,         -1,         21,
+    /*                            GPIO2_C6    GPIO0_C5    */  
+         -1,             -1,         86,         21,
     /*  GPIO1_A0     GPIO1_A1     GPIO4_A6    GPIO4_A7    */
          32,             33,        134,        135,
     /*  GPIO4_B2     GPIO4_B0     GPIO4_B3    GPIO0_D1    */
@@ -37,8 +37,8 @@ static int map[] = {
          24,             -1,         -1,         -1,
     /*               GPIO3_C1     GPIO3_C2     GPIO0_B7   */
          -1,            113,        114,         15,
-    /*                            GPIO0_C3     GPIO0_B4   */
-         -1,             -1,         19,         12,
+    /*  GPIO0_D5     GPIO0_D6     GPIO0_C3     GPIO0_B4   */
+         29,             30,         19,         12,
     /*  GPIO0_C1     GPIO3_B3     GPIO0_B6      GPIO4_B3  */
          17,             11,         14,         13
 };
