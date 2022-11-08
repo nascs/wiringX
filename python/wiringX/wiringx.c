@@ -408,13 +408,14 @@ PyMODINIT_FUNC initgpio(void) {
 	PyModule_AddObject(module, "HUMMINGBOARD_EDGE_SDL", Py_BuildValue("s", "hummingboard_edge_sdl"));
 	PyModule_AddObject(module, "HUMMINGBOARD_GATE_DQ", Py_BuildValue("s", "hummingboard_gate_dq"));
 	PyModule_AddObject(module, "HUMMINGBOARD_GATE_SDL", Py_BuildValue("s", "hummingboard_gate_sdl"));
-	PyModule_AddObject(module, "ROCK3C", Py_BuildValue("s", "rock3c"));
-	PyModule_AddObject(module, "ROCK3B", Py_BuildValue("s", "rock3b"));
 	PyModule_AddObject(module, "ROCK3A_V1_2", Py_BuildValue("s", "rock3a_v1_2"));
 	PyModule_AddObject(module, "ROCK3A_V1_3", Py_BuildValue("s", "rock3a_v1_3"));
+	PyModule_AddObject(module, "ROCK3B", Py_BuildValue("s", "rock3b"));
+	PyModule_AddObject(module, "ROCK3C", Py_BuildValue("s", "rock3c"));
 	PyModule_AddObject(module, "RADXA_CM3_IO", Py_BuildValue("s", "radxa_cm3_io"));
 	PyModule_AddObject(module, "RADXA_E23", Py_BuildValue("s", "radxa_e23"));
 	PyModule_AddObject(module, "RADXA_E25", Py_BuildValue("s", "radxa_e25"));
+	PyModule_AddObject(module, "ROCK4", Py_BuildValue("s", "rock4"));
 
 #if PY_MAJOR_VERSION >= 3
 	return module;

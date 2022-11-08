@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "pcduino1.h": "c"
+        "pcduino1.h": "c",
+        "rock3a_v1_2.h": "c"
     }
 }
