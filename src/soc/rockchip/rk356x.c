@@ -81,13 +81,6 @@ uintptr_t sysgrf_register_virtual_address = NULL;
 #define GRF_GPIO4D_IOMUX_L		 0x0078     // gpio4d0~gpio4d3 iomux
 #define GRF_GPIOXX_IOMUX_X       0x0000     // gpioXX iomux, which is nonextent
 #define REGISTER_WRITE_MASK  16         // High 16 bits are write mask,
-// with 1 enabling the coressponding lower bit
-// Set lower bit to 0 and higher bit (write mask) to 1
-//#define REGISTER_CLEAR_BIT(addr, bit) \
-    (*addr = *addr & ~(1 << bit) | (1 << bit << REGISTER_WRITE_MASK))
-// Set lower bit and higher bit (write mask) to 1
-//#define REGISTER_SET_BIT(addr, bit) \
-//	(*addr = *addr | (1 << bit) | (1 << bit << REGISTER_WRITE_MASK))
 
 #define REGISTER_CLEAR_BITS(addr, bit, size) \
     (*addr = *addr & ~(~(-1 << size) << bit) | (~(-1 << size) << bit << REGISTER_WRITE_MASK))
@@ -403,11 +396,11 @@ static int rk356xDigitalWrite(int i, enum digital_value_t value)
     data_reg = (volatile unsigned int *)(rk356x->gpio[pin->bank] + pin->data.offset);
     if (value == HIGH)
     {
-        REGISTER_SET_HIGH(data_reg, pin->data.bit, 0x1);
+        REGISTER_SET_HIGH(data_reg, pin->data.bit, 1);
     }
     else if (value == LOW)
     {
-        REGISTER_CLEAR_BITS(data_reg, pin->data.bit, 2);
+        REGISTER_CLEAR_BITS(data_reg, pin->data.bit, 1);
     }
     else
     {
@@ -465,7 +458,6 @@ static int rk356xPinMode(int i, enum pinmode_t mode)
     else {
         wiringXLog(LOG_ERR, "pin->bank out of range %i, expect 0~4", i);
     }
-
     REGISTER_CLEAR_BITS(grf_reg, pin->grf.bit, 2);
 
     dir_reg = (volatile unsigned int *)(rk356x->gpio[pin->bank] + pin->direction.offset);
@@ -614,7 +606,7 @@ void rk356xInit(void)
     rk356x->layout = layout;
 
     rk356x->support.isr_modes = ISR_MODE_RISING | ISR_MODE_FALLING | ISR_MODE_BOTH | ISR_MODE_NONE;
-    rk356x->page_size = sysconf(_SC_PAGESIZE);
+    rk356x->page_size = (1024*64);
     memcpy(rk356x->base_addr, gpio_register_physical_address, sizeof(gpio_register_physical_address));
 
     rk356x->gc = &rk356xGC;
