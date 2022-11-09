@@ -27,7 +27,7 @@ Supported Features
 GPIO Mapping
 ------------
 
-.. image:: radxa_e23.jpg
+.. image:: radxa_e25.jpg
 
 +----+----+----+----+----+---+----+---+---+----+----+----+----+
 | 5v | 5v | 0v | 15 | 16 | 1 | 0v | 4 | 5 | 0v |3.3v| 10 | 11 |
