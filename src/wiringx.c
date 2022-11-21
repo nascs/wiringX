@@ -37,6 +37,7 @@
 #include "soc/broadcom/2711.h"
 #include "soc/amlogic/s805.h"
 #include "soc/amlogic/s905.h"
+#include "soc/amlogic/a311d.h"
 #include "soc/samsung/exynos5422.h"
 #include "soc/rockchip/rk3399.h"
 
@@ -60,6 +61,7 @@
 #include "platform/hardkernel/odroidc2.h"
 #include "platform/hardkernel/odroidxu4.h"
 #include "platform/radxa/rock4.h"
+#include "platform/radxa/radxa_zero2.h"
 
 void wiringXDefaultLog(int prio, char *file, int line, const char *format_str, ...);
 
@@ -236,6 +238,7 @@ static void wiringXInit(void) {
 	broadcom2711Init();
 	amlogicS805Init();
 	amlogicS905Init();
+	a311dInit();
 	exynos5422Init();
 	rk3399Init();
 
@@ -260,6 +263,7 @@ static void wiringXInit(void) {
 	odroidc2Init();
 	odroidxu4Init();
 	rock4Init();
+	radxa_zero2Init();
 }
 
 EXPORT int wiringXSetup(char *name, void (*func)(int, char *, int, const char *, ...)) {
