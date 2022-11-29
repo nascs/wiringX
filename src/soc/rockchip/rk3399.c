@@ -266,7 +266,6 @@ static int rk3399Setup(void) {
 			return -1;
 		}
 	}
-
 	if((cru_register_virtual_address = (unsigned char *)mmap(0, rk3399->page_size, PROT_READ | PROT_WRITE, MAP_SHARED, rk3399->fd, CRU_REGISTER_PHYSICAL_ADDRESS)) == NULL) {
 		wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk3399->brand, rk3399->chip);
 		return -1;
