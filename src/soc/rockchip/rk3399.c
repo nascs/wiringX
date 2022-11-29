@@ -333,7 +333,7 @@ struct layout_t *rk3399GetLayout(int i, int *mapping) {
 
 static int rk3399DigitalWrite(int i, enum digital_value_t value) {
 	struct layout_t *pin = NULL;
-	uint32_t *data_reg = NULL;
+	volatile uint32_t *data_reg = NULL;
 
 	if((pin = rk3399GetPinLayout(i)) == NULL) {
 		return -1;
