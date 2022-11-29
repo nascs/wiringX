@@ -26,7 +26,7 @@
 const static uintptr_t gpio_register_physical_address[MAX_REG_AREA] = {0xff720000, 0xff730000, 0xff780000, 0xff788000, 0xff790000};
 #define GPIO_SWPORTA_DR			0x0000	// GPIO data write register offset
 #define GPIO_SWPORTA_DDR		0x0004  // GPIO direction control register offset
-#define GPIO_EXT_PORTA		0x0050	//GPIO data read register
+#define GPIO_EXT_PORTA			0x0050	//GPIO data read register
 
 static uintptr_t cru_register_virtual_address = NULL;
 static uintptr_t pmugrf_register_virtual_address = NULL;
