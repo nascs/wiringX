@@ -24,9 +24,9 @@
 #define GPIO_BANK_COUNT 5
 
 const static uintptr_t gpio_register_physical_address[MAX_REG_AREA] = {0xff720000, 0xff730000, 0xff780000, 0xff788000, 0xff790000};
-#define GPIO_SWPORTA_DR			0x0000	// GPIO data register offset
-#define GPIO_SWPORTA_DDR		0x0004	// GPIO direction control register offset
-#define GPIO_EXT_PORTA_OFFSET   0x0050
+#define GPIO_SWPORTA_DR			0x0000	// GPIO data write register offset
+#define GPIO_SWPORTA_DDR		0x0004  // GPIO direction control register offset
+#define GPIO_EXT_PORTA		0x0050  //GPIO data read register
 
 static uintptr_t cru_register_virtual_address = NULL;
 static uintptr_t pmugrf_register_virtual_address = NULL;
@@ -261,7 +261,6 @@ static int rk3399Setup(void) {
 		return -1;
 	}
 	for(i = 0; i < GPIO_BANK_COUNT; i++) {
-   //     printf("rk3399->fd = %d\n",rk3399->fd);
 		if((rk3399->gpio[i] = (unsigned char *)mmap(0, rk3399->page_size, PROT_READ | PROT_WRITE, MAP_SHARED, rk3399->fd, rk3399->base_addr[i])) == NULL) {
 			wiringXLog(LOG_ERR, "wiringX failed to map The %s %s GPIO memory address", rk3399->brand, rk3399->chip);
 			return -1;
@@ -335,7 +334,7 @@ struct layout_t *rk3399GetLayout(int i, int *mapping) {
 
 static int rk3399DigitalWrite(int i, enum digital_value_t value) {
 	struct layout_t *pin = NULL;
-	unsigned int *data_reg = 0;
+	uint32_t *data_reg = NULL;
 
 	if((pin = rk3399GetPinLayout(i)) == NULL) {
 		return -1;
@@ -346,7 +345,7 @@ static int rk3399DigitalWrite(int i, enum digital_value_t value) {
 		return -1;
 	}
 
-	data_reg = (volatile unsigned int *)(rk3399->gpio[pin->bank] + pin->data.offset);
+	data_reg = (volatile uint32_t *)(rk3399->gpio[pin->bank] + pin->data.offset);
 	if(value == HIGH) {
 		*data_reg |= (1 << (pin->data.bit));
 	} else if(value == LOW) {
@@ -361,7 +360,7 @@ static int rk3399DigitalWrite(int i, enum digital_value_t value) {
 
 static int rk3399DigitalRead(int i) {
 	struct layout_t *pin = NULL;
-	unsigned long *data_reg = NULL;
+	uint32_t *data_reg = NULL;
 	uint32_t val = 0;
 
 	if((pin = rk3399GetPinLayout(i)) == NULL) {
@@ -373,7 +372,7 @@ static int rk3399DigitalRead(int i) {
 		return -1;
 	}
 
-	data_reg = (volatile unsigned long *)(rk3399->gpio[pin->bank] + pin->data.offset + GPIO_EXT_PORTA_OFFSET);
+	data_reg = (volatile uint32_t *)(rk3399->gpio[pin->bank] + pin->data.offset + GPIO_EXT_PORTA);
 	val = *((volatile uint32_t *)data_reg);
 
 	return (int)((val & (1 << pin->data.bit)) >> pin->data.bit);
