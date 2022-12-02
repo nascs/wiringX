@@ -4,7 +4,7 @@
 .. role:: underline
    :class: underline
 
-Radxa ROCK 4 Series
+Radxa  Radxa Zero2
 ===================
 
 +----------------+---------------------------+

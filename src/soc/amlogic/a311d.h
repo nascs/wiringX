@@ -12,8 +12,8 @@
 #include "../soc.h"
 #include "../../wiringx.h"
 
-extern struct soc_t *amlogicA311d;
+extern struct soc_t *amlogicA311D;
 
-void amlogicA311dInit(void);
+void amlogicA311DInit(void);
 
 #endif
