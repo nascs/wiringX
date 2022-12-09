@@ -22,7 +22,7 @@
 #include <sys/wait.h>
 #include <pthread.h>
 
-#include "Python.h"
+#include "/usr/include/python3.9/Python.h"
 
 #include "wiringx.h"
 #include "platform/platform.h"

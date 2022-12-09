@@ -7,7 +7,7 @@ set(PROJECT_NAME wiringX)
 
 set(CMAKE_BUILD_TYPE Release)
 
-find_program(PYTHON "python")
+find_program(PYTHON "python3")
 
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
@@ -38,10 +38,10 @@ include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 install(
 	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
-	CODE "file(INSTALL \${folder}/wiringX/gpio.so DESTINATION /usr/local/lib/python2.7/dist-packages/wiringX)"
-	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION /usr/local/lib/python2.7/dist-packages/wiringX)"
+	CODE "file(INSTALL \${folder}/wiringX/gpio.cpython-39-aarch64-linux-gnu.so DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
+	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
 )
-install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python2.7/dist-packages/ RENAME wiringX-1.0.egg-info)
+install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python3.9/dist-packages/ RENAME wiringX-1.0.egg-info)
 
 execute_process(COMMAND python setup.py build
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
