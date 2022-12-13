@@ -1,13 +1,17 @@
 #!/bin/bash
 
+python_version=$(python -V)
+python_version=${python_version: 0:10}
+python_version=${python_version/" "/""}
+python_version=${python_version/P/p}
 if [ $1 = "purge" ] || [ $1 = "remove" ]; then
 
-	if [ -d /usr/local/lib/python3.9/dist-packages/wiringX ]; then
-		rm -r /usr/local/lib/python3.9/dist-packages/wiringX 1>/dev/null 2>/dev/null;
+	if [ -d /usr/local/lib/$python_version/dist-packages/wiringX ]; then
+		rm -r /usr/local/lib/$python_version/dist-packages/wiringX 1>/dev/null 2>/dev/null;
 	fi
 	
-	if [ -f /usr/local/lib/python3.9/dist-packages/wiringX-1.0.egg-info ]; then
-		rm /usr/local/lib/python3.9/dist-packages/wiringX-1.0.egg-info 1>/dev/null 2>/dev/null;
+	if [ -f /usr/local/lib/$python_version/dist-packages/wiringX-1.0.egg-info ]; then
+		rm /usr/local/lib/$python_version/dist-packages/wiringX-1.0.egg-info 1>/dev/null 2>/dev/null;
 	fi
 	
 fi
