@@ -47,10 +47,10 @@ set(desc_dir "/usr/local/lib/python${py_ver}/dist-packages/wiringX")
 install(
 	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
 	CODE "file(RENAME \${folder}/wiringX/gpio.cpython-${py_version}-aarch64-linux-gnu.so \${folder}/wiringX/gpio.so)"
-	CODE "file(INSTALL \${folder}/wiringX/gpio.so DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
-	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
+	CODE "file(INSTALL \${folder}/wiringX/gpio.so DESTINATION ${desc_dir})"
+	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION ${desc_dir})"
 )
-install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python3.9/dist-packages/ RENAME wiringX-1.0.egg-info)
+install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python${py_ver}/dist-packages/ RENAME wiringX-1.0.egg-info)
 
 execute_process(COMMAND python setup.py build
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
