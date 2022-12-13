@@ -7,7 +7,7 @@ set(PROJECT_NAME wiringX)
 
 set(CMAKE_BUILD_TYPE Release)
 
-find_program(PYTHON "python3")
+find_package(Python COMPONENTS Interpreter Development)
 
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
@@ -36,9 +36,18 @@ add_definitions(-DHASH="${git_ver}")
 
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 
+#py_ver: major.minor eg:python3.9
+string(SUBSTRING ${Python_VERSION} 0 3 py_ver)
+# message("--- py_ver is ${py_ver} ---")
+#py_version: majorminor eg:39
+string(JOIN "" py_version ${Python_VERSION_MAJOR} ${Python_VERSION_MINOR})
+# message("py_version is ${py_version}")
+set(desc_dir "/usr/local/lib/python${py_ver}/dist-packages/wiringX")
+
 install(
 	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
-	CODE "file(INSTALL \${folder}/wiringX/gpio.cpython-39-aarch64-linux-gnu.so DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
+	CODE "file(RENAME \${folder}/wiringX/gpio.cpython-${py_version}-aarch64-linux-gnu.so \${folder}/wiringX/gpio.so)"
+	CODE "file(INSTALL \${folder}/wiringX/gpio.so DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
 	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION /usr/local/lib/python3.9/dist-packages/wiringX)"
 )
 install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python3.9/dist-packages/ RENAME wiringX-1.0.egg-info)
