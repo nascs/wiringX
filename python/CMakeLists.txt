@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.18.0)
+cmake_minimum_required (VERSION 3.12.0)
 
 project(wiringX C)
 
@@ -39,13 +39,11 @@ include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories("/usr/include/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/")
 
 install(
-	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
-	CODE "set(ld_path \${folder}/wiringX)"
-	CODE "set(so_file \${ld_path}/\*.so)"
-	CODE "file(INSTALL ${so_file} DESTINATION ${desc_dir})"
-	CODE "file(INSTALL \${ld_path}/__init__.py DESTINATION ${desc_dir})"
+	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.\*/wiringX\")"
+	CODE "file(GLOB_RECURSE so_file \"*.so\")"
+	CODE "file(INSTALL \${so_file} DESTINATION ${desc_dir})"
+	CODE "file(INSTALL \${folder}/__init__.py DESTINATION ${desc_dir})"
 )
-
 install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME wiringX-python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}.egg-info)
 
 execute_process(COMMAND python setup.py build
@@ -53,7 +51,7 @@ execute_process(COMMAND python setup.py build
 	RESULT_VARIABLE python_results
 	OUTPUT_VARIABLE python_output)
 	
-set(CPACK_GENERATOR "DEB RPM")
+set(CPACK_GENERATOR "DEB;RPM")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
 set(CPACK_SOURCE_STRIP_FILES TRUE)
 set(CPACK_STRIP_FILES TRUE)
