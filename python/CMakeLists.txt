@@ -34,8 +34,6 @@ execute_process(COMMAND git log --oneline
 STRING(REGEX REPLACE "\n" "" git_ver "${git_ver}")
 add_definitions(-DHASH="${git_ver}")
 
-include_directories(${PROJECT_SOURCE_DIR}/src/)
-
 #py_ver: major.minor eg:python3.9
 string(SUBSTRING ${Python_VERSION} 0 3 py_ver)
 # message("--- py_ver is ${py_ver} ---")
@@ -44,12 +42,25 @@ string(JOIN "" py_version ${Python_VERSION_MAJOR} ${Python_VERSION_MINOR})
 # message("py_version is ${py_version}")
 set(desc_dir "/usr/local/lib/python${py_ver}/dist-packages/wiringX")
 
-install(
+include_directories(${PROJECT_SOURCE_DIR}/src/)
+include_directories("/usr/include/${py_ver}/")
+
+set(LOWER_VERSION 2)
+
+if(${Python_VERSION_MAJOR} GREATER ${LOWER_VERSION})
+	install(
 	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
-	CODE "file(RENAME \${folder}/wiringX/gpio.cpython-${py_version}-aarch64-linux-gnu.so \${folder}/wiringX/gpio.so)"
+	CODE "file(INSTALL \${folder}/wiringX/gpio.cpython-${py_version}-aarch64-linux-gnu.so DESTINATION ${desc_dir})"
+	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION ${desc_dir})"
+	)
+else()
+	install(
+	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
 	CODE "file(INSTALL \${folder}/wiringX/gpio.so DESTINATION ${desc_dir})"
 	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION ${desc_dir})"
-)
+	)
+endif()
+
 install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python${py_ver}/dist-packages/ RENAME wiringX-1.0.egg-info)
 
 execute_process(COMMAND python setup.py build
