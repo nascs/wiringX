@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required (VERSION 3.12.0)
 
 project(wiringX C)
 
@@ -33,35 +33,20 @@ execute_process(COMMAND git log --oneline
 
 STRING(REGEX REPLACE "\n" "" git_ver "${git_ver}")
 add_definitions(-DHASH="${git_ver}")
-
-#py_ver: major.minor eg:python3.9
-string(SUBSTRING ${Python_VERSION} 0 3 py_ver)
-# message("--- py_ver is ${py_ver} ---")
-#py_version: majorminor eg:39
-string(JOIN "" py_version ${Python_VERSION_MAJOR} ${Python_VERSION_MINOR})
-# message("py_version is ${py_version}")
-set(desc_dir "/usr/local/lib/python${py_ver}/dist-packages/wiringX")
+set(desc_dir "/usr/local/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/dist-packages/wiringX")
 
 include_directories(${PROJECT_SOURCE_DIR}/src/)
-include_directories("/usr/include/${py_ver}/")
+include_directories("/usr/include/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/")
 
-set(LOWER_VERSION 2)
-
-if(${Python_VERSION_MAJOR} GREATER ${LOWER_VERSION})
-	install(
+install(
 	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
-	CODE "file(INSTALL \${folder}/wiringX/gpio.cpython-${py_version}-aarch64-linux-gnu.so DESTINATION ${desc_dir})"
-	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION ${desc_dir})"
-	)
-else()
-	install(
-	CODE "file(GLOB folder \"${CMAKE_BINARY_DIR}/lib.*\")"
-	CODE "file(INSTALL \${folder}/wiringX/gpio.so DESTINATION ${desc_dir})"
-	CODE "file(INSTALL \${folder}/wiringX/__init__.py DESTINATION ${desc_dir})"
-	)
-endif()
+	CODE "set(ld_path \${folder}/wiringX)"
+	CODE "set(so_file \${ld_path}/\*.so)"
+	CODE "file(INSTALL ${so_file} DESTINATION ${desc_dir})"
+	CODE "file(INSTALL \${ld_path}/__init__.py DESTINATION ${desc_dir})"
+)
 
-install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python${py_ver}/dist-packages/ RENAME wiringX-1.0.egg-info)
+install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME wiringX-python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}.egg-info)
 
 execute_process(COMMAND python setup.py build
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
