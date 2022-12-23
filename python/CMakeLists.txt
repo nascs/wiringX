@@ -33,14 +33,13 @@ execute_process(COMMAND git log --oneline
 
 STRING(REGEX REPLACE "\n" "" git_ver "${git_ver}")
 add_definitions(-DHASH="${git_ver}")
-set(desc_dir "/usr/local/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/dist-packages/wiringX")
 
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories("${Python_INCLUDE_DIRS}")
 
 install(
 	CODE "file(GLOB_RECURSE output_files \"*.so\" \"*init*.py\")"
-	CODE "file(INSTALL \${output_files} DESTINATION ${desc_dir})"
+	CODE "file(INSTALL \${output_files} DESTINATION ${Python_SITELIB}/wiringX)"
 )
 install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME wiringX-python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}.egg-info)
 
