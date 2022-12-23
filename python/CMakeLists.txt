@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12.0)
 
 project(wiringX C)
 
-set(PROJECT_VERSION 1.0)
+set(PROJECT_VERSION 2.0)
 set(PROJECT_NAME wiringX)
 
 set(CMAKE_BUILD_TYPE Release)
@@ -38,10 +38,10 @@ include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories("${Python_INCLUDE_DIRS}")
 
 install(
-	CODE "file(GLOB_RECURSE output_files \"${CMAKE_BINARY_DIR}/lib.*\" \"*.so\" \"*init*.py\")"
+	CODE "file(GLOB_RECURSE output_files \"${CMAKE_BINARY_DIR}/lib.*\/wiringX/*.so\" \"${CMAKE_BINARY_DIR}/lib.*\/wiringX/__init__.py\" )"
 	CODE "file(INSTALL \${output_files} DESTINATION ${Python_SITELIB}/wiringX)"
 )
-install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME wiringX-python-${git_commits}-g${git_ver}.egg-info)
+install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME python-wiirngX-v${PROJECT_VERSION}.egg-info)
 
 execute_process(COMMAND python setup.py build
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
