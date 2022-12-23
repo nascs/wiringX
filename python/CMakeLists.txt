@@ -38,10 +38,10 @@ include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories("${Python_INCLUDE_DIRS}")
 
 install(
-	CODE "file(GLOB_RECURSE output_files \"*.so\" \"*init*.py\")"
+	CODE "file(GLOB_RECURSE output_files \"${CMAKE_BINARY_DIR}/lib.*\" \"*.so\" \"*init*.py\")"
 	CODE "file(INSTALL \${output_files} DESTINATION ${Python_SITELIB}/wiringX)"
 )
-install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME wiringX-python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}.egg-info)
+install(FILES ${PROJECT_SOURCE_DIR}/PKG-INFO DESTINATION lib/python/dist-packages/ RENAME wiringX-python-${git_commits}-g${git_ver}.egg-info)
 
 execute_process(COMMAND python setup.py build
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -49,7 +49,7 @@ execute_process(COMMAND python setup.py build
 	OUTPUT_VARIABLE python_output)
 
 set(CPACK_GENERATOR "DEB;RPM")
-set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set(CPACK_SOURCE_STRIP_FILES TRUE)
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_PACKAGE_CONTACT "CurlyMo <info@pilight.org>")
