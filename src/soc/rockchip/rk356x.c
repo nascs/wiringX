@@ -33,7 +33,7 @@ uintptr_t sysgrf_register_virtual_address = NULL;
 #define PMUCRU_REGISTER_PHYSICAL_ADDRESS    0xfdd00000
 #define PMUGRF_REGISTER_PHYSICAL_ADDRESS    0xfdc20000	
 #define SYSGRF_REGISTER_PHYSICAL_ADDRESS    0xfdc60000
-#define CPUGRF_REGISTER_PHYSICAL_ADDRESS    0xfdc30000									            	
+#define CPUGRF_REGISTER_PHYSICAL_ADDRESS    0xfdc30000					            	
 #define GPIO_SWPORT_DR_L         0x0000     // output for the lower 16 bits of I/O port, GPIOX_AX GPIOX_BX
 #define GPIO_SWPORT_DR_H         0x0004     // output for the higher 16 bits of I/O port, GPIOX_CX GPIOX_DX
 #define GPIO_SWPORT_DDR_L        0x0008     // data direction for the lower bits of I/O port, GPIOX_AX GPIOX_BX
@@ -146,22 +146,22 @@ static struct layout_t
     {"GPIO0_B5", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0B_IOMUX_H,  4}, {GPIO_SWPORT_DDR_L, 13}, {GPIO_SWPORT_DR_L, 13}, {GPIO_EXT_PORT, 13}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
     {"GPIO0_B6", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0B_IOMUX_H,  8}, {GPIO_SWPORT_DDR_L, 14}, {GPIO_SWPORT_DR_L, 14}, {GPIO_EXT_PORT, 14}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
     {"GPIO0_B7", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0B_IOMUX_H, 12}, {GPIO_SWPORT_DDR_L, 15}, {GPIO_SWPORT_DR_L, 15}, {GPIO_EXT_PORT, 15}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C0", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L,  0}, {GPIO_SWPORT_DDR_H,  0}, {GPIO_SWPORT_DR_H,  0}, {GPIO_EXT_PORT,  0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C1", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L,  4}, {GPIO_SWPORT_DDR_H,  1}, {GPIO_SWPORT_DR_H,  1}, {GPIO_EXT_PORT,  1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C2", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L,  8}, {GPIO_SWPORT_DDR_H,  2}, {GPIO_SWPORT_DR_H,  2}, {GPIO_EXT_PORT,  2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C3", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L, 12}, {GPIO_SWPORT_DDR_H,  3}, {GPIO_SWPORT_DR_H,  3}, {GPIO_EXT_PORT,  3}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C4", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H,  0}, {GPIO_SWPORT_DDR_H,  4}, {GPIO_SWPORT_DR_H,  4}, {GPIO_EXT_PORT,  4}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C5", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H,  4}, {GPIO_SWPORT_DDR_H,  5}, {GPIO_SWPORT_DR_H,  5}, {GPIO_EXT_PORT,  5}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C6", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H,  8}, {GPIO_SWPORT_DDR_H,  6}, {GPIO_SWPORT_DR_H,  6}, {GPIO_EXT_PORT,  6}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_C7", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H, 12}, {GPIO_SWPORT_DDR_H,  7}, {GPIO_SWPORT_DR_H,  7}, {GPIO_EXT_PORT,  7}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D0", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L,  0}, {GPIO_SWPORT_DDR_H,  8}, {GPIO_SWPORT_DR_H,  8}, {GPIO_EXT_PORT,  8}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D1", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L,  4}, {GPIO_SWPORT_DDR_H,  9}, {GPIO_SWPORT_DR_H,  9}, {GPIO_EXT_PORT,  9}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D2", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L,  8}, {GPIO_SWPORT_DDR_H, 10}, {GPIO_SWPORT_DR_H, 10}, {GPIO_EXT_PORT, 10}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D3", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L, 12}, {GPIO_SWPORT_DDR_H, 11}, {GPIO_SWPORT_DR_H, 11}, {GPIO_EXT_PORT, 11}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D4", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H,  0}, {GPIO_SWPORT_DDR_H, 12}, {GPIO_SWPORT_DR_H, 12}, {GPIO_EXT_PORT, 12}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D5", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H,  4}, {GPIO_SWPORT_DDR_H, 13}, {GPIO_SWPORT_DR_H, 13}, {GPIO_EXT_PORT, 13}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D6", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H,  8}, {GPIO_SWPORT_DDR_H, 14}, {GPIO_SWPORT_DR_H, 14}, {GPIO_EXT_PORT, 14}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-    {"GPIO0_D7", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H, 12}, {GPIO_SWPORT_DDR_H, 15}, {GPIO_SWPORT_DR_H, 15}, {GPIO_EXT_PORT, 15}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0}, 
+    {"GPIO0_C0", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L,  0}, {GPIO_SWPORT_DDR_H,  0}, {GPIO_SWPORT_DR_H,  0}, {GPIO_EXT_PORT,  16}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C1", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L,  4}, {GPIO_SWPORT_DDR_H,  1}, {GPIO_SWPORT_DR_H,  1}, {GPIO_EXT_PORT, 17}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C2", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L,  8}, {GPIO_SWPORT_DDR_H,  2}, {GPIO_SWPORT_DR_H,  2}, {GPIO_EXT_PORT, 18}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C3", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_L, 12}, {GPIO_SWPORT_DDR_H,  3}, {GPIO_SWPORT_DR_H,  3}, {GPIO_EXT_PORT, 19}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C4", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H,  0}, {GPIO_SWPORT_DDR_H,  4}, {GPIO_SWPORT_DR_H,  4}, {GPIO_EXT_PORT, 20}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C5", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H,  4}, {GPIO_SWPORT_DDR_H,  5}, {GPIO_SWPORT_DR_H,  5}, {GPIO_EXT_PORT, 21}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C6", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H,  8}, {GPIO_SWPORT_DDR_H,  6}, {GPIO_SWPORT_DR_H,  6}, {GPIO_EXT_PORT, 22}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_C7", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0C_IOMUX_H, 12}, {GPIO_SWPORT_DDR_H,  7}, {GPIO_SWPORT_DR_H,  7}, {GPIO_EXT_PORT, 23}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D0", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L,  0}, {GPIO_SWPORT_DDR_H,  8}, {GPIO_SWPORT_DR_H,  8}, {GPIO_EXT_PORT, 24}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D1", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L,  4}, {GPIO_SWPORT_DDR_H,  9}, {GPIO_SWPORT_DR_H,  9}, {GPIO_EXT_PORT, 25}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D2", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L,  8}, {GPIO_SWPORT_DDR_H, 10}, {GPIO_SWPORT_DR_H, 10}, {GPIO_EXT_PORT, 26}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D3", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_L, 12}, {GPIO_SWPORT_DDR_H, 11}, {GPIO_SWPORT_DR_H, 11}, {GPIO_EXT_PORT, 27}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D4", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H,  0}, {GPIO_SWPORT_DDR_H, 12}, {GPIO_SWPORT_DR_H, 12}, {GPIO_EXT_PORT, 28}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D5", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H,  4}, {GPIO_SWPORT_DDR_H, 13}, {GPIO_SWPORT_DR_H, 13}, {GPIO_EXT_PORT, 29}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D6", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H,  8}, {GPIO_SWPORT_DDR_H, 14}, {GPIO_SWPORT_DR_H, 14}, {GPIO_EXT_PORT, 30}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+    {"GPIO0_D7", 0, {PMUCRU_PMUGATE_CON01, 9}, {PMU_GFR_GPIO0D_IOMUX_H, 12}, {GPIO_SWPORT_DDR_H, 15}, {GPIO_SWPORT_DR_H, 15}, {GPIO_EXT_PORT, 31}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0}, 
     {"GPIO1_A0", 1, {CRU_GATE_CON31, 2}, {GRF_GPIO1A_IOMUX_L,  0}, {GPIO_SWPORT_DDR_L,  0}, {GPIO_SWPORT_DR_L,  0}, {GPIO_EXT_PORT,  0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
     {"GPIO1_A1", 1, {CRU_GATE_CON31, 2}, {GRF_GPIO1A_IOMUX_L,  4}, {GPIO_SWPORT_DDR_L,  1}, {GPIO_SWPORT_DR_L,  1}, {GPIO_EXT_PORT,  1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
     {"GPIO1_A2", 1, {CRU_GATE_CON31, 2}, {GRF_GPIO1A_IOMUX_L,  8}, {GPIO_SWPORT_DDR_L,  2}, {GPIO_SWPORT_DR_L,  2}, {GPIO_EXT_PORT,  2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
@@ -319,6 +319,7 @@ static int rk356xSetup(void)
         wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk356x->brand, rk356x->chip);
         return -1;
     }
+
     if ((pmugrf_register_virtual_address = (unsigned char *)mmap(0, rk356x->page_size, PROT_READ | PROT_WRITE, MAP_SHARED, rk356x->fd, PMUGRF_REGISTER_PHYSICAL_ADDRESS)) == NULL)
     {
         wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk356x->brand, rk356x->chip);
@@ -400,14 +401,14 @@ static int rk356xDigitalWrite(int i, enum digital_value_t value)
         return -1;
     }
 
-    out_reg = (volatile unsigned int *)(rk356x->gpio[pin->bank] + pin->in.offset);
+    out_reg = (volatile unsigned int *)(rk356x->gpio[pin->bank] + pin->out.offset);
     if (value == HIGH)
     {
-        REGISTER_SET_HIGH(out_reg, pin->in.bit, 1);
+        REGISTER_SET_HIGH(out_reg, pin->out.bit, 1);
     }
     else if (value == LOW)
     {
-        REGISTER_CLEAR_BITS(out_reg, pin->in.bit, 1);
+        REGISTER_CLEAR_BITS(out_reg, pin->out.bit, 1);
     }
     else
     {
@@ -453,25 +454,25 @@ static int rk356xPinMode(int i, enum pinmode_t mode)
         return -1;
     }
 
-    cru_reg = (volatile unsigned int *)(cru_register_virtual_address + pin->cru.offset);
-    REGISTER_CLEAR_BITS(cru_reg, pin->cru.bit, 2);
-
     if(pin->bank == 0 ) {
+        cru_reg = (volatile unsigned int *)(pmucru_register_virtual_address + pin->cru.offset);
         grf_reg = (volatile unsigned int *)(pmugrf_register_virtual_address + pin->grf.offset);
     }
     else if (pin->bank >= 1 || pin->bank <= 4) {
+        cru_reg = (volatile unsigned int *)(cru_register_virtual_address + pin->cru.offset);
         grf_reg = (volatile unsigned int *)(sysgrf_register_virtual_address + pin->grf.offset);
     }
     else {
         wiringXLog(LOG_ERR, "pin->bank out of range %i, expect 0~4", i);
     }
-    REGISTER_CLEAR_BITS(grf_reg, pin->grf.bit, 2);
+    REGISTER_CLEAR_BITS(cru_reg, pin->cru.bit, 1);
+    REGISTER_CLEAR_BITS(grf_reg, pin->grf.bit, 3);
 
     dir_reg = (volatile unsigned int *)(rk356x->gpio[pin->bank] + pin->direction.offset);
     if (mode == PINMODE_INPUT) {
-        REGISTER_CLEAR_BITS(dir_reg, pin->direction.bit, 1);
+        REGISTER_CLEAR_BITS(dir_reg, pin->direction.bit, 0x2);
     } else if (mode == PINMODE_OUTPUT) {
-        REGISTER_SET_HIGH(dir_reg, pin->direction.bit, 1);
+        REGISTER_SET_HIGH(dir_reg, pin->direction.bit, 0x1);
     }
     else {
         wiringXLog(LOG_ERR, "invalid pin mode %i for GPIO %i", mode, i);
