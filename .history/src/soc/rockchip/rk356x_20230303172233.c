@@ -323,7 +323,7 @@ static int rk356xSetup(void)
   {
     wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk356x->brand, rk356x->chip);
     return -1;
-  }      
+ }      
   if ((sysgrf_register_virtual_address = (unsigned char *)mmap(0, rk356x->page_size, PROT_READ | PROT_WRITE, MAP_SHARED, rk356x->fd, SYSGRF_REGISTER_PHYSICAL_ADDRESS)) == NULL)
   {
     wiringXLog(LOG_ERR, "wiringX failed to map The %s %s GRF memory address", rk356x->brand, rk356x->chip);
@@ -460,7 +460,7 @@ static int rk356xPinMode(int i, enum pinmode_t mode)
   else if (pin->bank >= 1 || pin->bank <= 4) {
     cru_reg = (volatile unsigned int *)(cru_register_virtual_address + pin->cru.offset);
     grf_reg = (volatile unsigned int *)(sysgrf_register_virtual_address + pin->grf.offset);
-  }
+ }
   else {
     wiringXLog(LOG_ERR, "pin->bank out of range %i, expect 0~4", i);
   }

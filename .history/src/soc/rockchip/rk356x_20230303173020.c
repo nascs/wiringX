@@ -460,7 +460,7 @@ static int rk356xPinMode(int i, enum pinmode_t mode)
   else if (pin->bank >= 1 || pin->bank <= 4) {
     cru_reg = (volatile unsigned int *)(cru_register_virtual_address + pin->cru.offset);
     grf_reg = (volatile unsigned int *)(sysgrf_register_virtual_address + pin->grf.offset);
-  }
+ }
   else {
     wiringXLog(LOG_ERR, "pin->bank out of range %i, expect 0~4", i);
   }
