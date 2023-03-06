@@ -242,7 +242,6 @@ static void wiringXInit(void) {
 	rk3399Init();
 	rk356xInit();
 
-
 	/* Init all platforms */
 	pcduino1Init();
 	bananapi1Init();

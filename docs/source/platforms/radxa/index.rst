@@ -2,7 +2,7 @@ Radxa
 =====
 
 .. toctree::
-   :maxdepth: 2
+	 :maxdepth: 2
 
-   rock3c
-   rock4
+	 rock3c
+	 rock4

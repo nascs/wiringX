@@ -2,7 +2,7 @@
 .. |no| image:: ../../images/no.png
 
 .. role:: underline
-   :class: underline
+	 :class: underline
 
 Radxa ROCK 3C
 =====================
@@ -10,7 +10,7 @@ Radxa ROCK 3C
 +----------------+--------------------+
 | System on Chip | Rockchip RK3566-T  |
 +----------------+--------------------+
-| Number GPIO    |  28                |
+| Number GPIO    | 28                 |
 +----------------+--------------------+
 | Status         | Fully supported    |
 +----------------+--------------------+
