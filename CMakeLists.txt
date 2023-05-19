@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8.12)
 
 project(wiringx C)
 
@@ -9,6 +9,9 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+
+set (CMAKE_C_COMPILER "/opt/riscv64-linux/bin/riscv64-unknown-linux-gnu-gcc")
+set (CMAKE_CXX_COMPILER "/opt/riscv64-linux/bin/riscv64-unknown-linux-gnu-++")
 
 #Final compilation all platforms
 #Removing debugging for final compilation
@@ -96,6 +99,8 @@ file(GLOB wiringx
 	"${PROJECT_SOURCE_DIR}/src/platform/xunlong/*.h"
 	"${PROJECT_SOURCE_DIR}/src/platform/radxa/*.c"
 	"${PROJECT_SOURCE_DIR}/src/platform/radxa/*.h"
+	"${PROJECT_SOURCE_DIR}/src/platform/milkv/*.c"
+	"${PROJECT_SOURCE_DIR}/src/platform/milkv/*.h"
 
 	"${PROJECT_SOURCE_DIR}/src/soc/*.c"
 	"${PROJECT_SOURCE_DIR}/src/soc/*.h"
@@ -111,6 +116,8 @@ file(GLOB wiringx
 	"${PROJECT_SOURCE_DIR}/src/soc/samsung/*.c"
 	"${PROJECT_SOURCE_DIR}/src/soc/rockchip/*.c"
 	"${PROJECT_SOURCE_DIR}/src/soc/rockchip/*.h"
+	"${PROJECT_SOURCE_DIR}/src/soc/sophgo/*.c"
+	"${PROJECT_SOURCE_DIR}/src/soc/sophgo/*.h"
 
 )
 

@@ -39,6 +39,7 @@
 #include "soc/amlogic/s905.h"
 #include "soc/samsung/exynos5422.h"
 #include "soc/rockchip/rk3399.h"
+#include "soc/sophgo/cv180.h"
 
 #include "platform/linksprite/pcduino1.h"
 #include "platform/lemaker/bananapi1.h"
@@ -60,6 +61,7 @@
 #include "platform/hardkernel/odroidc2.h"
 #include "platform/hardkernel/odroidxu4.h"
 #include "platform/radxa/rock4.h"
+#include "platform/milkv/duo.h"
 
 void wiringXDefaultLog(int prio, char *file, int line, const char *format_str, ...);
 
@@ -119,7 +121,7 @@ static void delayMicrosecondsHard(unsigned int howLong) {
 	tLong.tv_sec  = howLong / 1000000;
 	tLong.tv_usec = howLong % 1000000;
 #else
-	tLong.tv_sec  = (__time_t)howLong / 1000000;
+	tLong.tv_sec  = (time_t)howLong / 1000000;
 	tLong.tv_usec = (__suseconds_t)howLong % 1000000;
 #endif
 	timeradd(&tNow, &tLong, &tEnd);
@@ -135,7 +137,7 @@ EXPORT void delayMicroseconds(unsigned int howLong) {
 	long int uSecs = howLong % 1000000;
 	unsigned int wSecs = howLong / 1000000;
 #else
-	long int uSecs = (__time_t)howLong % 1000000;
+	long int uSecs = (time_t)howLong % 1000000;
 	unsigned int wSecs = howLong / 1000000;
 #endif
 
@@ -147,7 +149,7 @@ EXPORT void delayMicroseconds(unsigned int howLong) {
 #ifdef _WIN32
 		sleeper.tv_sec = wSecs;
 #else
-		sleeper.tv_sec = (__time_t)wSecs;	
+		sleeper.tv_sec = (time_t)wSecs;	
 #endif
 		sleeper.tv_nsec = (long)(uSecs * 1000L);
 		nanosleep(&sleeper, NULL);
@@ -238,6 +240,7 @@ static void wiringXInit(void) {
 	amlogicS905Init();
 	exynos5422Init();
 	rk3399Init();
+	cv180Init();
 
 	/* Init all platforms */
 	pcduino1Init();
@@ -260,6 +263,7 @@ static void wiringXInit(void) {
 	odroidc2Init();
 	odroidxu4Init();
 	rock4Init();
+	milkv_duoInit();
 }
 
 EXPORT int wiringXSetup(char *name, void (*func)(int, char *, int, const char *, ...)) {
