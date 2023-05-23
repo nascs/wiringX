@@ -38,7 +38,7 @@ static int map[] = {
 	/*	XGPIOA[27]	XGPIOA[26]	XGPIOC[10]	XGPIOB[3]	*/
 			20,		21,		22,		23,
 	/*	XGPIOB[6]										*/
-			24,		-1,		-1,		-1,
+			-1,		-1,		-1,		-1,
 			-1,		-1,		-1,		-1
 };
 
