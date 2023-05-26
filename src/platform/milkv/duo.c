@@ -29,7 +29,7 @@ static int map[] = {
 			0,		1,		2,		3,
 	/*	PWR_GPIO[20]	PWR_GPIO[19]	PWR_GPIO[23]	PWR_GPIO[22]	*/
 			4,		5,		6,		7,
-	/*	PWR_GPIO[21]	PWR_GPIO[18]	PWR_GPIO[4]	XGPIOC[9]	*/
+	/*	PWR_GPIO[21]	PWR_GPIO[18]	XGPIOC[9]	PWR_GPIO[10]	*/
 			8,		9,		10,		11,
 	/*	XGPIOA[16]	XGPIOA[17]	XGPIOA[14]	XGPIOA[15]	*/
 			12,		13,		14,		15,
