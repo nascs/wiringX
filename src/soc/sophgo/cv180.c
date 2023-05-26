@@ -23,7 +23,7 @@
 
 #define CV180_GPIO_GROUP_COUNT 4
 
-const static uintptr_t gpio_register_physical_address[MAX_REG_AREA] = {0x03020000, 0x03021000, 0x03022000, 0x03023000};
+const static uintptr_t gpio_register_physical_address[MAX_REG_AREA] = {0x03020000, 0x03021000, 0x03022000, 0x05021000};
 #define GPIO_SWPORTA_DR		0x000	
 #define GPIO_SWPORTA_DDR		0x004
 #define GPIO_EXT_PORTA		0x050
@@ -84,9 +84,9 @@ static struct layout_t {
 	//gpio9, 
 	{"PWR_GPIO_18", 3, 398, {0x108c, 0x3}, {GPIO_SWPORTA_DDR, 18}, {GPIO_SWPORTA_DR, 18},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	//gpio10, 
-	{"PWR_GPIO_4", 3, 384, {0x1068, 0x1}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio11, 
 	{"XGPIOC_9", 2, 425, {0x10f0, 0x1}, {GPIO_SWPORTA_DDR, 9}, {GPIO_SWPORTA_DR, 9},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	//gpio11, 
+	{"XGPIOC_10", 2, 426, {0x10f4, 0x1}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	//gpio12, 
 	{"XGPIOA_16", 0, 496, {0x1024, 0x3}, {GPIO_SWPORTA_DDR, 16}, {GPIO_SWPORTA_DR, 16},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	//gpio13, 
@@ -108,7 +108,7 @@ static struct layout_t {
 	//gpio21, 
 	{"XGPIOA_26", 0, 506, {0x102c, 0x2}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	//gpio22, 
-	{"XGPIOC_10", 2, 426, {0x10f4, 0x1}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"PWR_GPIO_4", 3, 384, {0x1068, 0x1}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	//gpio23, 
 	{"XGPIOB_3", 1, 454, {0x10a8, 0x0}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	//gpio24, 
@@ -276,6 +276,7 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 	printf("pin->num: %d\n", pin->num);
 
 	sprintf(path, "/sys/class/gpio/gpio%d", pin->num);
+	printf("path: %s\n", path);
 	if((soc_sysfs_check_gpio(cv180, path)) == -1) {
 		sprintf(path, "/sys/class/gpio/export");
 		if(soc_sysfs_gpio_export(cv180, path, pin->num) == -1) {
@@ -295,8 +296,7 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 	if(soc_sysfs_set_gpio_interrupt_mode(cv180, path, mode) == -1) {
 		return -1;
 	}
-	
-	
+
 	sprintf(path, "/sys/devices/platform/%x.gpio/gpiochip%d/gpio/gpio%d/value", gpio_register_physical_address[pin->gpio_group], pin->gpio_group, pin->num);
 	printf("path = %s\n", path);
 	if((pin->fd = soc_sysfs_gpio_reset_value(cv180, path)) == -1) {
@@ -307,6 +307,49 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 
 	return 0;
 }
+
+
+// static int cv180ISR(int i, enum isr_mode_t mode) {
+// 	struct layout_t *pin = NULL;
+// 	char path[PATH_MAX];
+// 	memset(path, 0, sizeof(path));
+
+// 	if((pin = cv180GetIrqLayout(i)) == NULL) {
+// 		return -1;
+// 	}
+
+// 	sprintf(path, "/sys/class/gpio/gpio%d", pin->num);
+// 	printf("path: %s\n", path);
+
+// 	if((soc_sysfs_check_gpio(cv180, path)) == -1) {
+// 		sprintf(path, "/sys/class/gpio/export");
+// 		if(soc_sysfs_gpio_export(cv180, path, pin->num) == -1) {
+// 			return -1;
+// 		}
+// 	}
+
+// 	sprintf(path, "/sys/class/gpio/gpio%d/direction", pin->num);
+// 	printf("path: %s\n", path);
+// 	if(soc_sysfs_set_gpio_direction(cv180, path, "in") == -1) {
+// 		return -1;
+// 	}
+
+// 	sprintf(path, "/sys/class/gpio/gpio%d/edge", pin->num);
+// 	printf("path: %s\n", path);
+// 	if(soc_sysfs_set_gpio_interrupt_mode(cv180, path, mode) == -1) {
+// 		return -1;
+// 	}
+
+// 	sprintf(path, "/sys/class/gpio/gpio%d/value", pin->num);
+// 	printf("path: %s\n", path);
+// 	if((pin->fd = soc_sysfs_gpio_reset_value(cv180, path)) == -1) {
+// 		return -1;
+// 	}
+
+// 	pin->mode = PINMODE_INTERRUPT;
+
+// 	return 0;
+// }
 
 static int cv180WaitForInterrupt(int i, int ms) {
 	struct layout_t *pin = NULL;
