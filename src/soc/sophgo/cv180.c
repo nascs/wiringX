@@ -240,10 +240,7 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 		return -1;
 	}
 
-	printf("pin->num: %d\n", pin->num);
-
 	sprintf(path, "/sys/class/gpio/gpio%d", pin->num);
-	printf("path: %s\n", path);
 	if((soc_sysfs_check_gpio(cv180, path)) == -1) {
 		sprintf(path, "/sys/class/gpio/export");
 		if(soc_sysfs_gpio_export(cv180, path, pin->num) == -1) {
@@ -251,23 +248,17 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 		}
 	}
 
-	printf("cv180->irq: %d\n", cv180->irq[i]);
-
-	printf("gpio_register_physical_address[pin->gpio_group]: %x\n", gpio_register_physical_address[pin->gpio_group]);
 	sprintf(path, "/sys/devices/platform/%x.gpio/gpiochip%d/gpio/gpio%d/direction", gpio_register_physical_address[pin->gpio_group], pin->gpio_group, pin->num);
-	printf("path = %s\n", path);
 	if(soc_sysfs_set_gpio_direction(cv180, path, "in") == -1) {
 		return -1;
 	}
 
 	sprintf(path, "/sys/devices/platform/%x.gpio/gpiochip%d/gpio/gpio%d/edge", gpio_register_physical_address[pin->gpio_group], pin->gpio_group, pin->num);
-	printf("path = %s\n", path);
 	if(soc_sysfs_set_gpio_interrupt_mode(cv180, path, mode) == -1) {
 		return -1;
 	}
 
 	sprintf(path, "/sys/devices/platform/%x.gpio/gpiochip%d/gpio/gpio%d/value", gpio_register_physical_address[pin->gpio_group], pin->gpio_group, pin->num);
-	printf("path = %s\n", path);
 	if((pin->fd = soc_sysfs_gpio_reset_value(cv180, path)) == -1) {
 		return -1;
 	}
