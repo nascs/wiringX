@@ -63,63 +63,35 @@ static struct layout_t {
 	enum pinmode_t mode;
 	int fd;
 } layout[] = {
-	//gpio0, 
 	{"XGPIOA_28", 0, 508, {0x104c, 0x3}, {GPIO_SWPORTA_DDR, 28}, {GPIO_SWPORTA_DR, 28},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio1, 
 	{"XGPIOA_29", 0, 509, {0x1050, 0x3}, {GPIO_SWPORTA_DDR, 29}, {GPIO_SWPORTA_DR, 29},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio2, 
-	{"PWR_GPIO_26", 3, 406, {0x1084, 0x1}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio3, 
-	{"PWR_GPIO_25", 3, 405, {0x1088, 0x1}, {GPIO_SWPORTA_DDR, 25}, {GPIO_SWPORTA_DR, 25},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio4, 
+	{"PWR_GPIO_26", 3, 406, {0x1084, 0x3}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"PWR_GPIO_25", 3, 405, {0x1088, 0x3}, {GPIO_SWPORTA_DDR, 25}, {GPIO_SWPORTA_DR, 25},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	{"PWR_GPIO_20", 3, 500, {0x1094, 0x3}, {GPIO_SWPORTA_DDR, 20}, {GPIO_SWPORTA_DR, 20},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio5, 
 	{"PWR_GPIO_19", 3, 499, {0x1090, 0x3}, {GPIO_SWPORTA_DDR, 19}, {GPIO_SWPORTA_DR, 19},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio6, 
 	{"PWR_GPIO_23", 3, 403, {0x10a0, 0x3}, {GPIO_SWPORTA_DDR, 23}, {GPIO_SWPORTA_DR, 23},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio7, 
 	{"PWR_GPIO_22", 3, 402, {0x109c, 0x3}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio8, 
 	{"PWR_GPIO_21", 3, 401, {0x1098, 0x3}, {GPIO_SWPORTA_DDR, 21}, {GPIO_SWPORTA_DR, 21},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio9, 
 	{"PWR_GPIO_18", 3, 398, {0x108c, 0x3}, {GPIO_SWPORTA_DDR, 18}, {GPIO_SWPORTA_DR, 18},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio10, 
-	{"XGPIOC_9", 2, 425, {0x10f0, 0x1}, {GPIO_SWPORTA_DDR, 9}, {GPIO_SWPORTA_DR, 9},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio11, 
-	{"XGPIOC_10", 2, 426, {0x10f4, 0x1}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio12, 
+	{"XGPIOC_9", 2, 425, {0x10f0, 0x3}, {GPIO_SWPORTA_DDR, 9}, {GPIO_SWPORTA_DR, 9},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"XGPIOC_10", 2, 426, {0x10f4, 0x3}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	{"XGPIOA_16", 0, 496, {0x1024, 0x3}, {GPIO_SWPORTA_DDR, 16}, {GPIO_SWPORTA_DR, 16},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio13, 
 	{"XGPIOA_17", 0, 497, {0x1028, 0x3}, {GPIO_SWPORTA_DDR, 17}, {GPIO_SWPORTA_DR, 17},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio_14, 
 	{"XGPIOA_14", 0, 494, {0x101c, 0x1}, {GPIO_SWPORTA_DDR, 14}, {GPIO_SWPORTA_DR, 14},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio15, 
-	{"XGPIOA_15", 0, 495, {0x1020, 0x0}, {GPIO_SWPORTA_DDR, 15}, {GPIO_SWPORTA_DR, 15},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio16, 
-	{"XGPIOA_23", 0, 503, {0x103c, 0x2}, {GPIO_SWPORTA_DDR, 23}, {GPIO_SWPORTA_DR, 23},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio17, 
-	{"XGPIOA_24", 0, 504, {0x1040, 0x2}, {GPIO_SWPORTA_DDR, 24}, {GPIO_SWPORTA_DR, 24},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio18, 
+	{"XGPIOA_15", 0, 495, {0x1020, 0x3}, {GPIO_SWPORTA_DDR, 15}, {GPIO_SWPORTA_DR, 15},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"XGPIOA_23", 0, 503, {0x103c, 0x3}, {GPIO_SWPORTA_DDR, 23}, {GPIO_SWPORTA_DR, 23},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"XGPIOA_24", 0, 504, {0x1040, 0x3}, {GPIO_SWPORTA_DDR, 24}, {GPIO_SWPORTA_DR, 24},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 	{"XGPIOA_22", 0, 502, {0x1030, 0x3}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio19, 
 	{"XGPIOA_25", 0, 505, {0x1034, 0x3}, {GPIO_SWPORTA_DDR, 25}, {GPIO_SWPORTA_DR, 25},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio20, 
-	{"XGPIOA_27", 0, 507, {0x1038, 0x2}, {GPIO_SWPORTA_DDR, 27}, {GPIO_SWPORTA_DR, 27},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio21, 
-	{"XGPIOA_26", 0, 506, {0x102c, 0x2}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio22, 
-	{"PWR_GPIO_4", 3, 384, {0x1068, 0x1}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio23, 
-	{"XGPIOB_3", 1, 454, {0x10a8, 0x0}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-	//gpio24, 
-	{"XGPIOB_6", 2, 451, {0x10ac, 0x1}, {GPIO_SWPORTA_DDR, 6}, {GPIO_SWPORTA_DR, 6},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
-
+	{"XGPIOA_27", 0, 507, {0x1038, 0x3}, {GPIO_SWPORTA_DDR, 27}, {GPIO_SWPORTA_DR, 27},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"XGPIOA_26", 0, 506, {0x102c, 0x3}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"PWR_GPIO_4", 3, 384, {0x1068, 0x3}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"XGPIOB_3", 2, 454, {0x10a8, 0x3}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"XGPIOB_6", 2, 451, {0x10ac, 0x3}, {GPIO_SWPORTA_DDR, 6}, {GPIO_SWPORTA_DR, 6},  FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
 };
 
 static int cv180Setup(void) {
 	int i = 0;
-	printf("\n");
-	printf("===== cv180Setup =====!\n");
 
 	if((cv180->fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) {
 		wiringXLog(LOG_ERR, "wiringX failed to open /dev/mem for raw memory access");
@@ -132,7 +104,6 @@ static int cv180Setup(void) {
 			return -1;
 		}
 	}
-
 	if((pinmux_register_virtual_address = (unsigned char *)mmap(0, cv180->page_size, PROT_READ | PROT_WRITE, MAP_SHARED, cv180->fd, PINMUX_BASE)) == NULL) {
 		wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", cv180->brand, cv180->chip);
 		return -1;
@@ -175,7 +146,7 @@ struct layout_t *cv180GetLayout(int i, int *mapping) {
 
 	pin = &cv180->layout[mapping[i]];
 	if(pin->gpio_group < 0 || pin->gpio_group >= CV180_GPIO_GROUP_COUNT) {
-		wiringXLog(LOG_ERR, "pin->group out of range: %i, expect 0~4", pin->gpio_group);
+		wiringXLog(LOG_ERR, "pin->group out of range: %i, expect 0~3", pin->gpio_group);
 		return NULL;
 	}
 
@@ -229,7 +200,6 @@ static int cv180DigitalRead(int i) {
 	data_reg = (volatile unsigned int *)(cv180->gpio[pin->gpio_group] + pin->data.offset + GPIO_EXT_PORTA);
 	val = *data_reg;
 
-	//GPIO_EXT_PORTA
 	return (int)((val & (1 << pin->data.bit)) >> pin->data.bit);
 }
 
@@ -242,12 +212,9 @@ static int cv180PinMode(int i, enum pinmode_t mode) {
 	if((pin = cv180GetPinLayout(i)) == NULL) {
 		return -1;
 	}
-	printf("pin->name: %s\n", pin->name);
 
 	pinmux_reg = (volatile unsigned int *) (pinmux_register_virtual_address + pin->pinmux.offset);
-
 	*pinmux_reg = pin->pinmux.value;
-	printf("cv180->gpio[pin->gpio_group]: %x\tpinmux_reg: %x\n", &cv180->gpio[pin->gpio_group], *pinmux_reg);
 
 	dir_reg = (volatile unsigned int *)(cv180->gpio[pin->gpio_group] + pin->direction.offset);
 	if(mode == PINMODE_INPUT) {
@@ -284,6 +251,8 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 		}
 	}
 
+	printf("cv180->irq: %d\n", cv180->irq[i]);
+
 	printf("gpio_register_physical_address[pin->gpio_group]: %x\n", gpio_register_physical_address[pin->gpio_group]);
 	sprintf(path, "/sys/devices/platform/%x.gpio/gpiochip%d/gpio/gpio%d/direction", gpio_register_physical_address[pin->gpio_group], pin->gpio_group, pin->num);
 	printf("path = %s\n", path);
@@ -307,49 +276,6 @@ static int cv180ISR(int i, enum isr_mode_t mode) {
 
 	return 0;
 }
-
-
-// static int cv180ISR(int i, enum isr_mode_t mode) {
-// 	struct layout_t *pin = NULL;
-// 	char path[PATH_MAX];
-// 	memset(path, 0, sizeof(path));
-
-// 	if((pin = cv180GetIrqLayout(i)) == NULL) {
-// 		return -1;
-// 	}
-
-// 	sprintf(path, "/sys/class/gpio/gpio%d", pin->num);
-// 	printf("path: %s\n", path);
-
-// 	if((soc_sysfs_check_gpio(cv180, path)) == -1) {
-// 		sprintf(path, "/sys/class/gpio/export");
-// 		if(soc_sysfs_gpio_export(cv180, path, pin->num) == -1) {
-// 			return -1;
-// 		}
-// 	}
-
-// 	sprintf(path, "/sys/class/gpio/gpio%d/direction", pin->num);
-// 	printf("path: %s\n", path);
-// 	if(soc_sysfs_set_gpio_direction(cv180, path, "in") == -1) {
-// 		return -1;
-// 	}
-
-// 	sprintf(path, "/sys/class/gpio/gpio%d/edge", pin->num);
-// 	printf("path: %s\n", path);
-// 	if(soc_sysfs_set_gpio_interrupt_mode(cv180, path, mode) == -1) {
-// 		return -1;
-// 	}
-
-// 	sprintf(path, "/sys/class/gpio/gpio%d/value", pin->num);
-// 	printf("path: %s\n", path);
-// 	if((pin->fd = soc_sysfs_gpio_reset_value(cv180, path)) == -1) {
-// 		return -1;
-// 	}
-
-// 	pin->mode = PINMODE_INTERRUPT;
-
-// 	return 0;
-// }
 
 static int cv180WaitForInterrupt(int i, int ms) {
 	struct layout_t *pin = NULL;
