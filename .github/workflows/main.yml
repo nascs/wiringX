@@ -1,4 +1,4 @@
-name: Build WiringX
+name: Build Project
 on:
   workflow_dispatch:
   pull_request:
@@ -21,10 +21,11 @@ jobs:
           echo "Environment setup complete."
       - name: Build project
         run: |
+          Project_HOME_PATH=$PWD
           echo  "============== $PWD =============="
           mkdir build && cd build
-          cmake .. && make -j8 && cpack -G DEB
-          echo  "============== $PWD =============="
+          cmake "$Project_HOME_PATH"  && make -j8 && cpack -G DEB
+          echo  "======== Build complete ====== $PWD =============="
 
   upload:
     needs: build # 声明 upload 作业依赖于 build 作业
