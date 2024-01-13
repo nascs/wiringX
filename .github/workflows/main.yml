@@ -23,19 +23,10 @@ jobs:
         sudo apt-get install -y git build-essential swig  libnode-dev  cmake libjson-c-dev libc6 libgcc1 libstdc++6   libgtest-dev pkg-config cmake-data
         echo "env ok ..."
 
-    - name: Build
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: upload artifact
       run: |
       echo  "============== $PWD =============="
-        # cd wiringX
-        # mkdir build
-        # cd build
-        # cmake ..
-        # make -j8
-        # cpack -G DEB
-        # echo  "============== $PWD =============="
-    # - name : Upload artifact
-    #   uses: actions/checkout@v4
-    #   with:
-    #     name: ${{ github.event.repository.name }}
-    #     path: |
-    #       ${{ env.artifacts_path }}/*.deb
+
