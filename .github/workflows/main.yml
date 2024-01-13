@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Installation depends
+      uses: actions/checkout@v4
       run: |
         echo "to prepare the env ..."
         sudo apt-get update
@@ -24,20 +25,17 @@ jobs:
 
     - name: Build
       run: |
-        echo "to build wiringX"
-        cd wiringX
-        mkdir build
-        cd build
-        cmake ..
-        make -j8
-        cpack -G DEB
-        echo  "============== $PWD =============="
-        ls *.deb
-        wiringX_deb_file=$(ls *.deb)
-        echo "where is deb file: $wiringX_deb_file"
-    - name : Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ github.event.repository.name }}
-        path: |
-          ${{ env.artifacts_path }}/*.deb
+      echo  "============== $PWD =============="
+        # cd wiringX
+        # mkdir build
+        # cd build
+        # cmake ..
+        # make -j8
+        # cpack -G DEB
+        # echo  "============== $PWD =============="
+    # - name : Upload artifact
+    #   uses: actions/checkout@v4
+    #   with:
+    #     name: ${{ github.event.repository.name }}
+    #     path: |
+    #       ${{ env.artifacts_path }}/*.deb
