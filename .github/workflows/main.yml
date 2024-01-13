@@ -25,6 +25,8 @@ jobs:
           echo  "======== Build complete ====== $PWD =============="
       - name: Upload artifact
         uses: actions/upload-artifact@v4
+        env:
+          FOLDER: build
         with:
           name: wiringx-deb
           path: ./*.deb
