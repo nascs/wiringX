@@ -27,4 +27,4 @@ jobs:
     steps:
       - name: upload artifact
         run: |
-          echo  "============== $PWD =============="
+          echo  "============== $PWD ==============="
