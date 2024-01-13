@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Installation depends
-      uses: actions/checkout@v4
       run: |
         echo "to prepare the env ..."
         sudo apt-get update
