@@ -27,6 +27,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: upload artifact
-      run: |
-      echo  "============== $PWD =============="
-
+        run: |
+          echo  "============== $PWD =============="
