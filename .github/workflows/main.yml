@@ -22,7 +22,8 @@ jobs:
       - name: Build project
         run: |
           Project_HOME_PATH=$PWD
-          echo  "============== $PWD =============="
+          ls_files=$(ls -a)
+          echo  "===== files: $ls_files ========= $PWD =============="
           mkdir build && cd build
           cmake "$Project_HOME_PATH"  && make -j8 && cpack -G DEB
           echo  "======== Build complete ====== $PWD =============="
