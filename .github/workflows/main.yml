@@ -24,6 +24,7 @@ jobs:
           echo  "============== $PWD =============="
           mkdir build && cd build
           cmake .. && make -j8 && cpack -G DEB
+          echo  "============== $PWD =============="
 
   upload:
     needs: build # 声明 upload 作业依赖于 build 作业
