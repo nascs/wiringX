@@ -23,14 +23,40 @@ jobs:
         run: |
           mkdir build && cd build && 
           echo  "======== Build complete ====== $PWD =============="
-
-  upload:
-    needs: build # 声明 upload 作业依赖于 build 作业
-    runs-on: ubuntu-latest
-    steps:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: My Artifact
+          name: wiringx-deb
           path: ./build/*.deb
+
+  upload:
+    needs: [build] # 声明 upload 作业依赖于 build 作业
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wiringx-deb
+          path: ./build
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: Automated build of WiringX
+          draft: false
+          prerelease: false
+      - name: Upload release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/*.deb
+          asset_name: wiringX.deb
+          asset_content_type: application/x-deb
+
 
