@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wiringx-deb
-          path: ./build/*.deb
+          path: ./*.deb
 
   upload:
     needs: [build] # 声明 upload 作业依赖于 build 作业
