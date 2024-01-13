@@ -21,6 +21,12 @@ jobs:
           echo "Environment setup complete."
       - name: Set up build env
         run: |
+          ls ..
+          echo  "=======================\n"
+          ls ../..
+          echo  "=======================\n"
+          ls ../../..
+          echo  "=======================\n"
           echo  "============== $PWD =============="
           mkdir build && cd build && cmake .. 
           working-directory: ./build
