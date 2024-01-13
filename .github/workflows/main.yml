@@ -1,10 +1,10 @@
-name: Build wiringX
-on: 
+name: Build Project
+on:
   workflow_dispatch:
-      pull_request:
-      push:
-        branches:
-          - github_action
+  pull_request:
+  push:
+    branches:
+      - github_action
 
 permissions:
   contents: write
@@ -15,16 +15,17 @@ jobs:
     steps:
       - name: Installation depends
         run: |
-          echo "to prepare the env ..."
+          echo "Preparing environment..."
           sudo apt-get update
-          echo "== install python env =="
-          sudo apt-get install -y python2-dev python2.7 python-dev-is-python3 python3 python3.9
-          sudo apt-get install -y git build-essential swig  libnode-dev  cmake libjson-c-dev libc6 libgcc1 libstdc++6   libgtest-dev pkg-config cmake-data
-          echo "env ok ..."
+          sudo apt-get install -y python2-dev python2.7 python-dev-is-python3 python3 python3.9 git build-essential swig libnode-dev cmake libjson-c-dev libc6 libgcc1 libstdc++6 libgtest-dev pkg-config cmake-data
+          echo "Environment setup complete."
 
   upload:
+    needs: build # 声明 upload 作业依赖于 build 作业
     runs-on: ubuntu-latest
     steps:
-      - name: upload artifact
-        run: |
-          echo  "============== $PWD ==============="
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: My Artifact
+          path: $HOME/artifacts
