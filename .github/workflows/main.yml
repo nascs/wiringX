@@ -13,62 +13,58 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
+
       - name: Installation depends
         run: |
           echo "Preparing environment..."
           sudo apt-get update
-          sudo apt-get install -y python2-dev python2.7 python-dev-is-python3 python3 python3.9 git build-essential swig libnode-dev cmake libjson-c-dev libc6 libgcc1 libstdc++6 libgtest-dev pkg-config cmake-data
-          echo "Environment setup complete."
+          sudo apt-get install -y python2-dev python2.7 python-dev-is-python3 python3 build-essential swig libnode-dev cmake libjson-c-dev libc6 libgcc1 libstdc++6 libgtest-dev pkg-config cmake-data
+          echo "===== Environment setup complete. ====="
+
       - name: Set up build env
         run: |
-          ls ..
-          echo  "=======================\n"
-          ls ../..
-          echo  "=======================\n"
-          ls ../../..
-          echo  "=======================\n"
-          echo  "============== $PWD =============="
-          mkdir build && cd build && cmake .. 
-          working-directory: ./build
+          export CC=/usr/bin/gcc
+          cd ${{ github.workspace }}/wiringX
+          echo ${{ github.workspace }}/wiringX
+          mkdir ${{ github.workspace }}/wiringX/build
+
       - name: Build project
-        run:    
+        run: |
+          cd ${{ github.workspace }}/wiringX/build
+          cmake .. 
           make -j8 && cpack -G DEB
           echo  "======== Build complete ====== $PWD =============="
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+
+      - name: Rename file
+        run: |
+          cd ${{ github.workspace }}/wiringX/build
+          cp libwiringx*.deb libwiringx.deb
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_RELEASE_TOKEN }}
         with:
-          name: wiringx-deb
-          path: ./*.deb
-
-  # upload:
-  #   needs: [build] # 声明 upload 作业依赖于 build 作业
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Upload artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: wiringx-deb
-  #         path: ./build
-  #     - name: Create release
-  #       id: create_release
-  #       uses: actions/create-release@v1
-  #       env: 
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         tag_name: ${{ github.ref }}
-  #         release_name: Release ${{ github.ref }}
-  #         body: Automated build of WiringX
-  #         draft: false
-  #         prerelease: false
-  #     - name: Upload release asset
-  #       id: upload-release-asset
-  #       uses: actions/upload-release-asset@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #         asset_path: ./build/*.deb
-  #         asset_name: wiringX.deb
-  #         asset_content_type: application/x-deb
-
-
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+    
+      - name: Release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ${{ github.workspace }}/wiringX/build/libwiringx.deb
+          asset_name: libwiringX.deb
+          asset_content_type: application/zip/deb
