@@ -31,20 +31,20 @@ jobs:
       - name: Set up build env
         run: |
           export CC=/usr/bin/gcc
-          cd ${{ github.workspace }}/wiringX
-          echo ${{ github.workspace }}/wiringX
-          mkdir ${{ github.workspace }}/wiringX/build
+          cd ${{ github.workspace }}/
+          echo ${{ github.workspace }}/
+          mkdir ${{ github.workspace }}/build
 
       - name: Build project
         run: |
-          cd ${{ github.workspace }}/wiringX/build
+          cd ${{ github.workspace }}/build
           cmake .. 
           make -j8 && cpack -G DEB
           echo  "======== Build complete ====== $PWD =============="
 
       - name: Rename file
         run: |
-          cd ${{ github.workspace }}/wiringX/build
+          cd ${{ github.workspace }}/build
           cp libwiringx*.deb libwiringx.deb
 
       - name: Create Release
