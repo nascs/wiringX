@@ -1,0 +1,382 @@
+/*
+  Copyright (c) 2024 Radxa Ltd.
+  Author: Nascs <nascs@radxa.com>
+          ZHANG Yuntian <yt@radxa.com>
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#include "rk3528.h"
+
+struct soc_t *rk3528 = NULL;
+
+#define GPIO_BANK_COUNT 5
+#define IOMUX_COUNT 3
+
+const uintptr_t rk3528_gpio_register_physical_address[MAX_REG_AREA] = {0xff610000, 0xffaf0000, 0xffb00000, 0xffb10000, 0xffb20000};
+
+uintptr_t gpio_iomux_address[MAX_REG_AREA] = {0xff540000, 0xff560000, 0xff570000, 0xff560000, 0xff550000};
+
+uintptr_t gpio_iomux_register_physical_address[MAX_REG_AREA] = {0};
+#define GPIO_SWPORTA_DR			0x0000	// GPIO data register offset
+#define GPIO_SWPORTA_DDR			0x0008	// GPIO direction control register offset
+#define GPIO_EXT_PORTA			0x0050	// GPIO data read register offset
+
+#define CRU_BASE	0xff4a0000
+#define	PMUCRU_BASE	0xff4b0000
+#define PMU_GATE_CON00L			0x0800	// PMUCRU_BASE: 0xff4b0000; bit 14: pclk_pmu_gpio0_en; bit 16~31 is write_enable
+#define CRU_GATE_CON26L			0x0868	// CRU_BASE	0xff4a0000; bit 4: pclk_gpio1_en; bit 16~31 is write_enable
+#define CRU_GATE_CON42L			0x08a8	// CRU_BASE	0xff4a0000; bit 5: pclk_gpio2_en; bit 16~31 is write_enable
+#define CRU_GATE_CON27L			0x086c	// CRU_BASE	0xff4a0000; bit 0: pclk_gpio3_en; bit 16~31 is write_enable
+#define CRU_GATE_CON37L			0x0894	// CRU_BASE	0xff4a0000; bit 8: pclk_gpio4_en; bit 16~31 is write_enable
+uintptr_t cru_base_register_virtual_address = NULL;
+uintptr_t pmucru_base_register_virtual_address = NULL;
+
+uintptr_t gpio_ioc_iomux_base_register_virtual_address = NULL;
+
+#define GPIO0_IOC_GPIO0_IOMUX_BASE			0xff540000 
+#define GPIO1_IOC_GPIO1_IOMUX_BASE			0xff560000
+#define GPIO2_IOC_GPIO2_IOMUX_BASE			0xff570000
+#define GPIO3_IOC_GPIO3_IOMUX_BASE			0xff560000
+#define GPIO4_IOC_GPIO4_IOMUX_BASE			0xff550000
+
+#define GPIO0_IOC_GPIO0A_IOMUX_SEL_L			0x0000	// gpio0a0 ~ gpio0a3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO0_IOC_GPIO0A_IOMUX_SEL_H			0x0004	// gpio0a4 ~ gpio0a5, 4'h0: gpio, bit 16~31 is write_enable
+
+#define GPIO1_IOC_GPIO1A_IOMUX_SEL_L			0x0020	// gpio1a0 ~ gpio1a3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1A_IOMUX_SEL_H			0x0024	// gpio1a4 ~ gpio1a7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1B_IOMUX_SEL_L			0x0028	// gpio1b0 ~ gpio1b3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1B_IOMUX_SEL_H			0x002c	// gpio1b4 ~ gpio1b7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1C_IOMUX_SEL_L			0x0030	// gpio1c0 ~ gpio1c3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1C_IOMUX_SEL_H			0x0034	// gpio1c4 ~ gpio1c7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1D_IOMUX_SEL_L			0x0038	// gpio1d0 ~ gpio1d3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO1_IOC_GPIO1D_IOMUX_SEL_H			0x003c	// gpio1d4 ~ gpio1d7, 4'h0: gpio, bit 16~31 is write_enable
+
+#define GPIO2_IOC_GPIO2A_IOMUX_SEL_L			0x0040	// gpio2a0 ~ gpio2a3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO2_IOC_GPIO2A_IOMUX_SEL_H			0x0044	// gpio2a4 ~ gpio2a7, 4'h0: gpio, bit 16~31 is write_enable
+
+#define GPIO3_IOC_GPIO3A_IOMUX_SEL_L			0x0060	// gpio3a0 ~ gpio3a3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3A_IOMUX_SEL_H			0x0064	// gpio3a4 ~ gpio3a7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3B_IOMUX_SEL_L			0x0068	// gpio3b0 ~ gpio3b3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3B_IOMUX_SEL_H			0x006c	// gpio3b4 ~ gpio3b7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3C_IOMUX_SEL_L			0x0070	// gpio3c0 ~ gpio3c3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3C_IOMUX_SEL_H			0x0074	// gpio3c4 ~ gpio3c7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3D_IOMUX_SEL_L			0x0078	// gpio3d0 ~ gpio3d3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO3_IOC_GPIO3D_IOMUX_SEL_H			0x007c	// gpio3d4 ~ gpio3d7, 4'h0: gpio, bit 16~31 is write_enable
+
+#define GPIO4_IOC_GPIO4A_IOMUX_SEL_L			0x0080	// gpio4a0 ~ gpio4a3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO4_IOC_GPIO4A_IOMUX_SEL_H			0x0084	// gpio4a4 ~ gpio4a7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO4_IOC_GPIO4B_IOMUX_SEL_L			0x0088	// gpio4b0 ~ gpio4b3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO4_IOC_GPIO4B_IOMUX_SEL_H			0x008c	// gpio4b4 ~ gpio4b7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO4_IOC_GPIO4C_IOMUX_SEL_L			0x0090	// gpio4c0 ~ gpio4c3, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO4_IOC_GPIO4C_IOMUX_SEL_H			0x0094	// gpio4c4 ~ gpio4c7, 4'h0: gpio, bit 16~31 is write_enable
+#define GPIO4_IOC_GPIO4D_IOMUX_SEL_L			0x0098	// gpio4d0 ~ gpio4d3, 4'h0: gpio, bit 16~31 is write_enable
+
+static struct layout_t layout[] = {
+	// gpio0
+	{"GPIO0_A0", 0, 0, {PMU_GATE_CON00L, 14}, {GPIO0_IOC_GPIO0A_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 0}, {GPIO_SWPORTA_DR, 0}, {GPIO_EXT_PORTA, 0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO0_A1", 0, 0, {PMU_GATE_CON00L, 14}, {GPIO0_IOC_GPIO0A_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 1}, {GPIO_SWPORTA_DR, 1}, {GPIO_EXT_PORTA, 1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO0_A2", 0, 0, {PMU_GATE_CON00L, 14}, {GPIO0_IOC_GPIO0A_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 2}, {GPIO_SWPORTA_DR, 2}, {GPIO_EXT_PORTA, 2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO0_A3", 0, 0, {PMU_GATE_CON00L, 14}, {GPIO0_IOC_GPIO0A_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3}, {GPIO_EXT_PORTA, 3}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO0_A4", 0, 0, {PMU_GATE_CON00L, 14}, {GPIO0_IOC_GPIO0A_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4}, {GPIO_EXT_PORTA, 4}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO0_A5", 0, 0, {PMU_GATE_CON00L, 14}, {GPIO0_IOC_GPIO0A_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 5}, {GPIO_SWPORTA_DR, 5}, {GPIO_EXT_PORTA, 5}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+
+	// gpio1
+	{"GPIO1_A0", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 0}, {GPIO_SWPORTA_DR, 0}, {GPIO_EXT_PORTA, 0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A1", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 1}, {GPIO_SWPORTA_DR, 1}, {GPIO_EXT_PORTA, 1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A2", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 2}, {GPIO_SWPORTA_DR, 2}, {GPIO_EXT_PORTA, 2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A3", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3}, {GPIO_EXT_PORTA, 3}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A4", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4}, {GPIO_EXT_PORTA, 4}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A5", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 5}, {GPIO_SWPORTA_DR, 5}, {GPIO_EXT_PORTA, 5}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A6", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 6}, {GPIO_SWPORTA_DR, 6}, {GPIO_EXT_PORTA, 6}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_A7", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1A_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 7}, {GPIO_SWPORTA_DR, 7}, {GPIO_EXT_PORTA, 7}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B0", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 8}, {GPIO_SWPORTA_DR, 8}, {GPIO_EXT_PORTA, 8}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B1", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 9}, {GPIO_SWPORTA_DR, 9}, {GPIO_EXT_PORTA, 9}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B2", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 10}, {GPIO_SWPORTA_DR, 10}, {GPIO_EXT_PORTA, 10}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B3", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 11}, {GPIO_SWPORTA_DR, 11}, {GPIO_EXT_PORTA, 11}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B4", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 12}, {GPIO_SWPORTA_DR, 12}, {GPIO_EXT_PORTA, 12}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B5", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 13}, {GPIO_SWPORTA_DR, 13}, {GPIO_EXT_PORTA, 13}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B6", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 14}, {GPIO_SWPORTA_DR, 14}, {GPIO_EXT_PORTA, 14}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_B7", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1B_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 15}, {GPIO_SWPORTA_DR, 15}, {GPIO_EXT_PORTA, 15}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C0", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 16}, {GPIO_SWPORTA_DR, 16}, {GPIO_EXT_PORTA, 16}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C1", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 17}, {GPIO_SWPORTA_DR, 17}, {GPIO_EXT_PORTA, 17}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C2", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 18}, {GPIO_SWPORTA_DR, 18}, {GPIO_EXT_PORTA, 18}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C3", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 19}, {GPIO_SWPORTA_DR, 19}, {GPIO_EXT_PORTA, 19}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C4", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 20}, {GPIO_SWPORTA_DR, 20}, {GPIO_EXT_PORTA, 20}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C5", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 21}, {GPIO_SWPORTA_DR, 21}, {GPIO_EXT_PORTA, 21}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C6", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22}, {GPIO_EXT_PORTA, 22}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_C7", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1C_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 23}, {GPIO_SWPORTA_DR, 23}, {GPIO_EXT_PORTA, 23}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D0", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 24}, {GPIO_SWPORTA_DR, 24}, {GPIO_EXT_PORTA, 24}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D1", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 25}, {GPIO_SWPORTA_DR, 25}, {GPIO_EXT_PORTA, 25}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D2", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26}, {GPIO_EXT_PORTA, 26}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D3", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 27}, {GPIO_SWPORTA_DR, 27}, {GPIO_EXT_PORTA, 27}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D4", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 28}, {GPIO_SWPORTA_DR, 28}, {GPIO_EXT_PORTA, 28}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D5", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 29}, {GPIO_SWPORTA_DR, 29}, {GPIO_EXT_PORTA, 29}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D6", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 30}, {GPIO_SWPORTA_DR, 30}, {GPIO_EXT_PORTA, 30}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO1_D7", 1, 0, {CRU_GATE_CON26L, 4}, {GPIO1_IOC_GPIO1D_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 31}, {GPIO_SWPORTA_DR, 31}, {GPIO_EXT_PORTA, 31}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+
+	// gpio2
+	{"GPIO2_A0", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 0}, {GPIO_SWPORTA_DR, 0}, {GPIO_EXT_PORTA, 0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO2_A1", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 1}, {GPIO_SWPORTA_DR, 1}, {GPIO_EXT_PORTA, 1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO2_A2", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 2}, {GPIO_SWPORTA_DR, 2}, {GPIO_EXT_PORTA, 2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO2_A3", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3}, {GPIO_EXT_PORTA, 3}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO2_A4", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4}, {GPIO_EXT_PORTA, 4}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO2_A5", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 5}, {GPIO_SWPORTA_DR, 5}, {GPIO_EXT_PORTA, 5}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO2_A6", 2, 1, {CRU_GATE_CON42L, 5}, {GPIO2_IOC_GPIO2A_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 6}, {GPIO_SWPORTA_DR, 6}, {GPIO_EXT_PORTA, 6}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+
+	// gpio3
+	{"GPIO3_A0", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 0}, {GPIO_SWPORTA_DR, 0}, {GPIO_EXT_PORTA, 0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A1", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 1}, {GPIO_SWPORTA_DR, 1}, {GPIO_EXT_PORTA, 1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A2", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 2}, {GPIO_SWPORTA_DR, 2}, {GPIO_EXT_PORTA, 2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A3", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3}, {GPIO_EXT_PORTA, 3}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A4", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4}, {GPIO_EXT_PORTA, 4}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A5", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 5}, {GPIO_SWPORTA_DR, 5}, {GPIO_EXT_PORTA, 5}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A6", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 6}, {GPIO_SWPORTA_DR, 6}, {GPIO_EXT_PORTA, 6}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_A7", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3A_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 7}, {GPIO_SWPORTA_DR, 7}, {GPIO_EXT_PORTA, 7}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B0", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 8}, {GPIO_SWPORTA_DR, 8}, {GPIO_EXT_PORTA, 8}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B1", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 9}, {GPIO_SWPORTA_DR, 9}, {GPIO_EXT_PORTA, 9}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B2", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 10}, {GPIO_SWPORTA_DR, 10}, {GPIO_EXT_PORTA, 10}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B3", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 11}, {GPIO_SWPORTA_DR, 11}, {GPIO_EXT_PORTA, 11}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B4", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 12}, {GPIO_SWPORTA_DR, 12}, {GPIO_EXT_PORTA, 12}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B5", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 13}, {GPIO_SWPORTA_DR, 13}, {GPIO_EXT_PORTA, 13}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B6", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 14}, {GPIO_SWPORTA_DR, 14}, {GPIO_EXT_PORTA, 14}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_B7", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3B_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 15}, {GPIO_SWPORTA_DR, 15}, {GPIO_EXT_PORTA, 15}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C0", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 16}, {GPIO_SWPORTA_DR, 16}, {GPIO_EXT_PORTA, 16}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C1", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 17}, {GPIO_SWPORTA_DR, 17}, {GPIO_EXT_PORTA, 17}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C2", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 18}, {GPIO_SWPORTA_DR, 18}, {GPIO_EXT_PORTA, 18}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C3", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 19}, {GPIO_SWPORTA_DR, 19}, {GPIO_EXT_PORTA, 19}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C4", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 20}, {GPIO_SWPORTA_DR, 20}, {GPIO_EXT_PORTA, 20}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C5", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 21}, {GPIO_SWPORTA_DR, 21}, {GPIO_EXT_PORTA, 21}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C6", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22}, {GPIO_EXT_PORTA, 22}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_C7", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3C_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 23}, {GPIO_SWPORTA_DR, 23}, {GPIO_EXT_PORTA, 23}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D0", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 24}, {GPIO_SWPORTA_DR, 24}, {GPIO_EXT_PORTA, 24}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D1", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 25}, {GPIO_SWPORTA_DR, 25}, {GPIO_EXT_PORTA, 25}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D2", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26}, {GPIO_EXT_PORTA, 26}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D3", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 27}, {GPIO_SWPORTA_DR, 27}, {GPIO_EXT_PORTA, 27}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D4", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 28}, {GPIO_SWPORTA_DR, 28}, {GPIO_EXT_PORTA, 28}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D5", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 29}, {GPIO_SWPORTA_DR, 29}, {GPIO_EXT_PORTA, 29}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D6", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 30}, {GPIO_SWPORTA_DR, 30}, {GPIO_EXT_PORTA, 30}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO3_D7", 3, 1, {CRU_GATE_CON27L, 0}, {GPIO3_IOC_GPIO3D_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 31}, {GPIO_SWPORTA_DR, 31}, {GPIO_EXT_PORTA, 31}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+
+	// gpio4
+	{"GPIO4_A0", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 0}, {GPIO_SWPORTA_DR, 0}, {GPIO_EXT_PORTA, 0}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A1", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 1}, {GPIO_SWPORTA_DR, 1}, {GPIO_EXT_PORTA, 1}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A2", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 2}, {GPIO_SWPORTA_DR, 2}, {GPIO_EXT_PORTA, 2}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A3", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 3}, {GPIO_SWPORTA_DR, 3}, {GPIO_EXT_PORTA, 3}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A4", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 4}, {GPIO_SWPORTA_DR, 4}, {GPIO_EXT_PORTA, 4}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A5", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 5}, {GPIO_SWPORTA_DR, 5}, {GPIO_EXT_PORTA, 5}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A6", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 6}, {GPIO_SWPORTA_DR, 6}, {GPIO_EXT_PORTA, 6}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_A7", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4A_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 7}, {GPIO_SWPORTA_DR, 7}, {GPIO_EXT_PORTA, 7}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B0", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 8}, {GPIO_SWPORTA_DR, 8}, {GPIO_EXT_PORTA, 8}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B1", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 9}, {GPIO_SWPORTA_DR, 9}, {GPIO_EXT_PORTA, 9}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B2", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 10}, {GPIO_SWPORTA_DR, 10}, {GPIO_EXT_PORTA, 10}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B3", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 11}, {GPIO_SWPORTA_DR, 11}, {GPIO_EXT_PORTA, 11}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B4", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 12}, {GPIO_SWPORTA_DR, 12}, {GPIO_EXT_PORTA, 12}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B5", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 13}, {GPIO_SWPORTA_DR, 13}, {GPIO_EXT_PORTA, 13}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B6", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 14}, {GPIO_SWPORTA_DR, 14}, {GPIO_EXT_PORTA, 14}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_B7", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4B_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 15}, {GPIO_SWPORTA_DR, 15}, {GPIO_EXT_PORTA, 15}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C0", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 16}, {GPIO_SWPORTA_DR, 16}, {GPIO_EXT_PORTA, 16}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C1", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 17}, {GPIO_SWPORTA_DR, 17}, {GPIO_EXT_PORTA, 17}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C2", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 18}, {GPIO_SWPORTA_DR, 18}, {GPIO_EXT_PORTA, 18}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C3", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 19}, {GPIO_SWPORTA_DR, 19}, {GPIO_EXT_PORTA, 19}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C4", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_H, 0}, {GPIO_SWPORTA_DDR, 20}, {GPIO_SWPORTA_DR, 20}, {GPIO_EXT_PORTA, 20}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C5", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_H, 4}, {GPIO_SWPORTA_DDR, 21}, {GPIO_SWPORTA_DR, 21}, {GPIO_EXT_PORTA, 21}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C6", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_H, 8}, {GPIO_SWPORTA_DDR, 22}, {GPIO_SWPORTA_DR, 22}, {GPIO_EXT_PORTA, 22}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_C7", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4C_IOMUX_SEL_H, 12}, {GPIO_SWPORTA_DDR, 23}, {GPIO_SWPORTA_DR, 23}, {GPIO_EXT_PORTA, 23}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_D0", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4D_IOMUX_SEL_L, 0}, {GPIO_SWPORTA_DDR, 24}, {GPIO_SWPORTA_DR, 24}, {GPIO_EXT_PORTA, 24}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_D1", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4D_IOMUX_SEL_L, 4}, {GPIO_SWPORTA_DDR, 25}, {GPIO_SWPORTA_DR, 25}, {GPIO_EXT_PORTA, 25}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_D2", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4D_IOMUX_SEL_L, 8}, {GPIO_SWPORTA_DDR, 26}, {GPIO_SWPORTA_DR, 26}, {GPIO_EXT_PORTA, 26}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+	{"GPIO4_D3", 4, 1, {CRU_GATE_CON37L, 8}, {GPIO4_IOC_GPIO4D_IOMUX_SEL_L, 12}, {GPIO_SWPORTA_DDR, 27}, {GPIO_SWPORTA_DR, 27}, {GPIO_EXT_PORTA, 27}, FUNCTION_DIGITAL, PINMODE_NOT_SET, 0},
+};
+
+static int rk3528Setup(void) {
+	int i = 0;
+
+	if((rk3528->fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) {
+		wiringXLog(LOG_ERR, "wiringX failed to open /dev/mem for raw memory access");
+		return -1;
+	}
+	for(i = 0; i < GPIO_BANK_COUNT; i++) {
+		if((rk3528->gpio[i] = (unsigned char *)rockchip_mmap(rk3528, rk3528->base_addr[i])) == NULL) {
+			wiringXLog(LOG_ERR, "wiringX failed to map The %s %s GPIO memory address", rk3528->brand, rk3528->chip);
+			return -1;
+		}
+	}
+	for(i = 0; i < GPIO_BANK_COUNT; i++) {
+		if((gpio_iomux_register_physical_address[i] = (unsigned char *)rockchip_mmap(rk3528, gpio_iomux_address[i])) == NULL) {
+			wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk3528->brand, rk3528->chip);
+			return -1;
+		}
+	}
+
+	if((cru_base_register_virtual_address = (unsigned char *)rockchip_mmap(rk3528, CRU_BASE)) == NULL) {
+		wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk3528->brand, rk3528->chip);
+		return -1;
+	}
+	if((pmucru_base_register_virtual_address = (unsigned char *)rockchip_mmap(rk3528, PMUCRU_BASE)) == NULL) {
+		wiringXLog(LOG_ERR, "wiringX failed to map The %s %s CRU memory address", rk3528->brand, rk3528->chip);
+		return -1;
+	}
+
+	return 0;
+}
+
+static char *rk3528GetPinName(int pin) {
+	return rockchipGetPinName(rk3528, pin);
+}
+
+static void rk3528SetMap(int *map, size_t size) {
+	rockchipSetMap(rk3528, map, size);
+}
+
+static void rk3528SetIRQ(int *irq, size_t size) {
+	rockchipSetIRQ(rk3528, irq, size);
+}
+
+struct layout_t *rk3528GetLayout(int i, int *mapping) {
+	return rockchipGetLayout(rk3528, i, mapping);
+}
+
+static int rk3528DigitalWrite(int i, enum digital_value_t value) {
+	struct layout_t *pin = NULL;
+	unsigned int *data_reg = 0;
+
+	if((pin = rockchipGetPinLayout(rk3528, i)) == NULL) {
+		return -1;
+	}
+
+	if(pin->mode != PINMODE_OUTPUT) {
+		wiringXLog(LOG_ERR, "The %s %s GPIO%d is not set to output mode", rk3528->brand, rk3528->chip, i);
+		return -1;
+	}
+
+	data_reg = (volatile unsigned int *)(rk3528->gpio[pin->bank] + pin->out.offset);
+
+	printf("===== rk3528DigitalWrite: data_reg: 0x%x =====\n", *data_reg);
+	if(value == HIGH) {
+		*data_reg |= (1 << (pin->out.bit));
+	} else if(value == LOW) {
+		*data_reg &= ~(1 << (pin->out.bit));
+	} else {
+		wiringXLog(LOG_ERR, "invalid value %i for GPIO %i", value, i);
+		return -1;
+	}
+	printf("===== rk3528DigitalWrite: data_reg: after: 0x%x =====\n\n", *data_reg);
+
+	return 0;
+}
+
+static int rk3528DigitalRead(int i) {
+	return rockchipDigitalRead(rk3528, i);
+}
+
+static int rk3528PinMode(int i, enum pinmode_t mode) {
+	struct layout_t *pin = NULL;
+	unsigned int *cru_reg = NULL;
+	unsigned int *grf_reg = NULL;
+	unsigned int *dir_reg = NULL;
+
+	if((pin = rockchipGetPinLayout(rk3528, i)) == NULL) {
+		return -1;
+	}
+
+	printf("===== rk3528PinMode start: pin->name: %s  =====\n", pin->name);
+
+	if(pin->iomux_num == 0) {
+		cru_reg = (volatile unsigned int *)(cru_base_register_virtual_address + pin->cru.offset);
+	} else if(pin->iomux_num == 1) {
+		cru_reg = (volatile unsigned int *)(pmucru_base_register_virtual_address + pin->cru.offset);
+	} else {
+		wiringXLog(LOG_ERR, "pin->iomux_num out of range %i, expect 0~2", i);
+	}
+	printf("==== rk3528PinMode: *grf_reg: 0x%x =====\n", *cru_reg);
+	// set to low to enable the clock for GPIO bank
+	*cru_reg = REGISTER_CLEAR_BITS(cru_reg, pin->cru.bit, 1);
+	printf("==== rk3528PinMode: after change: *cru_reg: 0x%x =====\n", *cru_reg);
+
+	grf_reg = (volatile unsigned int *)(gpio_iomux_register_physical_address[pin->bank] + pin->grf.offset);
+	printf("\n==== rk3528PinMode: *grf_reg: 0x%x =====\n", *grf_reg);
+
+	*grf_reg = REGISTER_CLEAR_BITS(grf_reg, pin->grf.bit, 1);
+	printf("==== rk3528PinMode: after change: *grf_reg: 0x%x =====\n", *grf_reg);
+
+	dir_reg = (volatile unsigned int *)(rk3528->gpio[pin->bank] + pin->direction.offset);
+
+	printf("\n===== rk3528PinMode: *dir_reg: 0x%x =====\n", *dir_reg);
+	if(mode == PINMODE_INPUT) {
+		*dir_reg &= ~(1 << pin->direction.bit);
+	} else if(mode == PINMODE_OUTPUT) {
+		*dir_reg |= (1 << pin->direction.bit);
+	} else {
+		wiringXLog(LOG_ERR, "invalid pin mode %i for GPIO %i", mode, i);
+		return -1;
+	}
+	printf("\n===== rk3528PinMode: *dir_reg: after 0x%x =====\n\n", *dir_reg);
+
+	pin->mode = mode;
+
+	return 0;
+}
+
+static int rk3528ISR(int i, enum isr_mode_t mode) {
+	return rockchipISR(rk3528, i, mode);
+}
+
+static int rk3528WaitForInterrupt(int i, int ms) {
+	return rockchipWaitForInterrupt(rk3528, i, ms);
+}
+
+static int rk3528GC(void) {
+	rockchipGC(rk3528);
+
+	if(cru_base_register_virtual_address != NULL) {
+		munmap(cru_base_register_virtual_address, rk3528->page_size);
+		cru_base_register_virtual_address = NULL;
+	}
+	if(pmucru_base_register_virtual_address != NULL) {
+		munmap(pmucru_base_register_virtual_address, rk3528->page_size);
+		pmucru_base_register_virtual_address = NULL;
+	}
+	for(int i = 0; i < GPIO_BANK_COUNT; i++) {
+		if(gpio_iomux_register_physical_address[i] != NULL) {
+			munmap(gpio_iomux_register_physical_address[i], rk3528->page_size);
+			gpio_iomux_register_physical_address[i] = NULL;
+		}
+	}
+	for(int i = 0; i < GPIO_BANK_COUNT; i++) {
+		if(rk3528->gpio[i] != NULL) {
+			munmap(rk3528->gpio[i], rk3528->page_size);
+			rk3528->gpio[i] = NULL;
+		}
+	}
+
+	return 0;
+}
+
+static int rk3528SelectableFd(int i) {
+	return rockchipSelectableFd(rk3528, i);
+}
+
+void rk3528Init(void) {
+	soc_register(&rk3528, "Rockchip", "RK3528");
+
+	rk3528->layout = layout;
+
+	rk3528->support.isr_modes = ISR_MODE_RISING | ISR_MODE_FALLING | ISR_MODE_BOTH | ISR_MODE_NONE;
+	rk3528->page_size = (1024*64);
+	memcpy(rk3528->base_addr, rk3528_gpio_register_physical_address, sizeof(rk3528_gpio_register_physical_address));
+
+	rk3528->gc = &rk3528GC;
+	rk3528->selectableFd = &rk3528SelectableFd;
+	rk3528->pinMode = &rk3528PinMode;
+	rk3528->setup = &rk3528Setup;
+	rk3528->digitalRead = &rk3528DigitalRead;
+	rk3528->digitalWrite = &rk3528DigitalWrite;
+	rk3528->getPinName = &rk3528GetPinName;
+	rk3528->setMap = &rk3528SetMap;
+	rk3528->setIRQ = &rk3528SetIRQ;
+	rk3528->isr = &rk3528ISR;
+	rk3528->waitForInterrupt = &rk3528WaitForInterrupt;
+}

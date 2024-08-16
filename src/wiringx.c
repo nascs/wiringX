@@ -39,6 +39,7 @@
 #include "soc/amlogic/s905.h"
 #include "soc/samsung/exynos5422.h"
 #include "soc/rockchip/rk3399.h"
+#include "soc/rockchip/rk3528.h"
 #include "soc/rockchip/rk3588.h"
 #include "soc/sophgo/cv180x.h"
 
@@ -61,6 +62,7 @@
 #include "platform/hardkernel/odroidc1.h"
 #include "platform/hardkernel/odroidc2.h"
 #include "platform/hardkernel/odroidxu4.h"
+#include "platform/radxa/rock2.h"
 #include "platform/radxa/rock4.h"
 #include "platform/radxa/rock5b.h"
 #include "platform/milkv/duo.h"
@@ -242,6 +244,7 @@ static void wiringXInit(void) {
 	amlogicS905Init();
 	exynos5422Init();
 	rk3399Init();
+	rk3528Init();
 	rk3588Init();
 	cv180xInit();
 
@@ -265,6 +268,7 @@ static void wiringXInit(void) {
 	odroidc1Init();
 	odroidc2Init();
 	odroidxu4Init();
+	rock2Init();
 	rock4Init();
 	rock5bInit();
 	milkv_duoInit();
